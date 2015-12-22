@@ -2,7 +2,6 @@
 #include <vector>
 #include <libXFileSystem/XSystemInfo.h>
 #include <libXBase/XErrorConsole.h>
-#include "XConsoleModelProcess.h"
 
 #include "chantier.h"
 
@@ -16,13 +15,12 @@ Chantier::~Chantier()
 {
 }
 
-//void CreationListePano(std::string dossier, XErrorConsole *m_error)
-void CreationListePano(std::string dossier)
+//void Chantier::CreationListePano(std::string dossier, XErrorConsole *m_error)
+void Chantier::CreationListePano(std::string dossier)
 {
     XSystemInfo system;
     bool ok;
     //XErrorInfo(m_error,__FUNCTION__,dossier);
-    cout << dossier << endl;
     ok = system.FindFolder(dossier);
     cout << ok << endl;
     /*if (ok){

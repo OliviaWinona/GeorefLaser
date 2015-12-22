@@ -13,6 +13,7 @@
 #include "libXBase/XStringTools.h"
 #include "libXFileSystem/XPath.h"
 #include <algorithm>
+#include <iostream>
 
 std::string ws2s(const std::wstring& wstr)
 {
@@ -108,7 +109,7 @@ bool XSystemInfo::FindFile(const char* filename)
 	return true;
 }
 //-----------------------------------------------------------------------------
-// Permet de tester l'existence d'un répertoire
+// Permet de tester l'existence d'un rÃ©pertoire
 //-----------------------------------------------------------------------------
 bool XSystemInfo::FindFolder(std::string folder)
 {
@@ -116,8 +117,8 @@ bool XSystemInfo::FindFolder(std::string folder)
 		return false;
 	SubPathSep(folder);		
 
-	WIN32_FIND_DATA findData;
-    HANDLE file = FindFirstFile((LPCWSTR)folder.c_str(), &findData);
+    LPWIN32_FIND_DATAW findData;
+    HANDLE file = FindFirstFile((LPCWSTR)folder.c_str(), findData);
 	if (file == INVALID_HANDLE_VALUE)// Le repertoire n'existe pas
 		return false;
 	FindClose(file);
@@ -203,7 +204,7 @@ int XSystemInfo::CountFileInFolder(std::string folder, std::string filtre)
 	::FindClose(hFind);
 	return nCount;
 }
-//+ rapide que CountFileInFolder ( utilisé pour connaitre approximativement le nombre déléments d'un repertoire)
+//+ rapide que CountFileInFolder ( utilisÃ© pour connaitre approximativement le nombre dÃ©lÃ©ments d'un repertoire)
 //-----------------------------------------------------------------------------
 int XSystemInfo::CountElementsInFolder(std::string folder)
 {
@@ -314,7 +315,7 @@ std::string XSystemInfo::GetTempPath()
     return ws2s(path);
 }
 //-----------------------------------------------------------------------------
-// Renvoie la date système sous la forme yyyy:mm:dd
+// Renvoie la date systÃ¨me sous la forme yyyy:mm:dd
 //-----------------------------------------------------------------------------
 std::string XSystemInfo::DateSysteme(std::string sep)
 {
@@ -325,7 +326,7 @@ std::string XSystemInfo::DateSysteme(std::string sep)
 	return std::string(date);
 }
 //-----------------------------------------------------------------------------
-// Renvoie l'heure système sous la forme hh:mm:ss
+// Renvoie l'heure systÃ¨me sous la forme hh:mm:ss
 //-----------------------------------------------------------------------------
 std::string XSystemInfo::HeureSysteme(std::string sep)
 {
@@ -418,7 +419,7 @@ bool XSystemInfo::RenameFolder(std::string folder, std::string newName)
 }
 
 //-----------------------------------------------------------------------------
-//Détruit tout les fichiers d'un répertoire (pas les sous-répertoires !)
+//DÃ©truit tout les fichiers d'un rÃ©pertoire (pas les sous-rÃ©pertoires !)
 //-----------------------------------------------------------------------------
 int XSystemInfo::EmptyFolder(std::string folder)
 {
@@ -466,7 +467,7 @@ int XSystemInfo::EmptyFolder(std::string folder)
     return 0;
 }
 //-----------------------------------------------------------------------------
-//Détruit tout le contenu d'un répertoire (y compris les sous-répertoires !)
+//DÃ©truit tout le contenu d'un rÃ©pertoire (y compris les sous-rÃ©pertoires !)
 //-----------------------------------------------------------------------------
 int XSystemInfo::FullEmptyFolder(std::string folder)
 {
@@ -559,7 +560,7 @@ bool  XSystemInfo::CreateMultiDirectory(const char* FullDirecotryPath )
 	path="";
 	for(std::vector<std::string>::iterator it=directory.begin();it<directory.end();it++)
 	{
-		if((*it)[1]==':')//On va eviter de créer un disque...
+		if((*it)[1]==':')//On va eviter de crÃ©er un disque...
 		{
 			path+=(*it);
 			continue;
@@ -582,7 +583,7 @@ std::string XSystemInfo::ComputerName()
 		return std::string();
 	return std::string(buffer);
 }
-//Répertoire de l'executable---------------------------------------------------------------------------
+//RÃ©pertoire de l'executable---------------------------------------------------------------------------
 std::string  XSystemInfo::GetCurrentExe()
 {
     wchar_t buf[MAX_PATH];
@@ -700,7 +701,7 @@ SIZE_T XSystemInfo::GetLargestFreeMemRegion(LPVOID *lpBaseAddr)
 		else
 		{
 	//       if (showMemInfo)
-	//         _tprintf(_T(”### VirtualQuery failed (%p)n”), p);
+	//         _tprintf(_T(â€### VirtualQuery failed (%p)nâ€), p);
 		p = (void*) (((char*)p) + systemInfo.dwPageSize);
 		}
 	}
@@ -734,7 +735,7 @@ void XSystemInfo::SleepT(unsigned long milliSeconds)
 {
 	Sleep(milliSeconds);
 	/*
-	a implémenter dans la version unix avec 
+	a implÃ©menter dans la version unix avec 
 	#include <unistd.h>
 	 usleep(100*1e3);
 	 */
