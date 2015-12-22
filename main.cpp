@@ -2,11 +2,12 @@
 #include <libXBase/XErrorConsole.h>
 #include <libXFileSystem/XPath.h>
 #include <libXFileSystem/XSystemInfo.h>
-#include "chantier.h"
 #include "XConsoleModelProcess.h"
 #include "shellapi.h"
-
 #include "libXBase/XPt3D.h"
+
+#include "chantier.h"
+#include "fonctions.h"
 #define WIN32
 
 using namespace std;
@@ -16,7 +17,6 @@ XErrorConsole* m_error;
 std::ofstream m_log;
 std::string m_strAppPath;
 XConsoleModelProcess* m_process;
-
 
 bool InitInternalData()
 {
@@ -45,14 +45,19 @@ bool InitInternalData()
     return true;
 }
 
+
 int main(int argc, char **argv)
 {
     Chantier projet;
-    projet.nomDossier = "D:\ProjetInfo\donnees_test";
+    projet.nomDossier = "D:\\ProjetInfo\\donnees_test";
     InitInternalData();
-    XPt3D test;
+    //XPt3D test;
     XErrorAlert(m_error,__FUNCTION__,"alerte test");
     XErrorError(m_error,__FUNCTION__,"erreur test");
+
+    XErrorInfo(m_error,__FUNCTION__,projet.nomDossier.c_str());
+    //projet.CreationListePano(projet.nomDossier, &m_error);
+    projet.CreationListePano(projet.nomDossier);
     cout << "FIN" << endl;
     return 0;
 }

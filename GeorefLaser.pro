@@ -29,7 +29,8 @@ SOURCES += main.cpp \
     libXBase/XRect.cpp \
     libXBase/XStringTools.cpp \
     libXFileSystem/XPath.cpp \
-    libXFileSystem/XSystemInfo.cpp
+    libXFileSystem/XSystemInfo.cpp \
+    fonctions.cpp
 
 HEADERS += \
     chantier.h \
@@ -61,5 +62,6 @@ HEADERS += \
     libXBase/XStringTools.h \
     libXBase/XWait.h \
     libXFileSystem/XPath.h \
-    libXFileSystem/XSystemInfo.h
+    libXFileSystem/XSystemInfo.h \
+    fonctions.h
 
