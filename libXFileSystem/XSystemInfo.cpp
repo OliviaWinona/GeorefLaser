@@ -14,6 +14,7 @@
 #include "libXFileSystem/XPath.h"
 #include <algorithm>
 #include <iostream>
+#include <windows.h>
 
 std::string ws2s(const std::wstring& wstr)
 {
@@ -115,11 +116,14 @@ bool XSystemInfo::FindFolder(std::string folder)
 {
 	if (folder.size() == 0)
 		return false;
-	SubPathSep(folder);		
+    SubPathSep(folder);
 
     LPWIN32_FIND_DATAW findData;
     HANDLE file = FindFirstFile((LPCWSTR)folder.c_str(), findData);
+    std::cout << findData << std::endl;
+    std::cout << file << std::endl;
 	if (file == INVALID_HANDLE_VALUE)// Le repertoire n'existe pas
+        std::cout << "je suis dans ce if" << std::endl;
 		return false;
 	FindClose(file);
 

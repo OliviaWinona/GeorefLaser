@@ -3,6 +3,8 @@ CONFIG += console c++11
 CONFIG -= app_bundle
 CONFIG -= qt
 
+QMAKE_CXXFLAGS += -std=c++0x
+
 DEFINES += "WIN32"
 DEFINES += "_USE_MATH_DEFINES"
 

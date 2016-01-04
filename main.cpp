@@ -51,13 +51,11 @@ int main(int argc, char **argv)
     Chantier projet;
     projet.nomDossier = "D:\\ProjetInfo\\donnees_test";
     InitInternalData();
-    //XPt3D test; //Test point3D
-    //XErrorAlert(m_error,__FUNCTION__,"alerte test");
-    //XErrorError(m_error,__FUNCTION__,"erreur test");
 
     XErrorInfo(m_error,__FUNCTION__,projet.nomDossier.c_str());
     //projet.CreationListePano(projet.nomDossier, &m_error);
-    projet.CreationListePano(projet.nomDossier);
+    bool valide;
+    valide = projet.CreationListePano(projet.nomDossier);
     cout << "FIN" << endl;
     return 0;
 }

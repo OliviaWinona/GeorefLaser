@@ -9,15 +9,16 @@ class Chantier
 {
 public:
     Chantier();
+    Chantier(std::string _nomDossier, int _nbIm, std::initializer_list<Panoramique*> _lstPano);
     ~Chantier();
 
     // Méthodes
     //void CreationListePano(std::string dossier, XErrorConsole &m_error);
-    void CreationListePano(std::string dossier);
+    bool CreationListePano(std::string dossier);
 
     // Attributs
     std::string nomDossier;
-    int nbIm;
+    int nbIm = 0;
     std::vector<Panoramique*> listePano;
 
 };

@@ -9,6 +9,7 @@ class Appariement
 {
 public:
     Appariement();
+    Appariement(Panoramique _image1, Panoramique _image2, std::initializer_list<Point*> _lstPoints);
     ~Appariement();
 
     Panoramique *image1;

@@ -1,15 +1,37 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <Eigen/Dense>
 #include "panoramique.h"
 #include "appariement.h"
 #include "chantier.h"
 
 using namespace std;
 
-Panoramique::Panoramique()
+Panoramique::Panoramique() : monChantier(new Chantier), nom(""),
+                             largeur(0), hauteur(0),
+                             apparie(),
+                             tousPointsIm(),
+                             rotation(Eigen::Matrix3f::Zero()),
+                             translation(Eigen::Vector3f::Zero())
 {
+    cout << "constructeur par défaut de panoramique" << endl;
+    cout << rotation << endl;
 }
+
+Panoramique::Panoramique(Chantier _monChantier, std::string _nom, long _largeur, long _hauteur, std::initializer_list<Appariement *> _apparie, std::initializer_list<Point *> _tousPointsIm, Eigen::Matrix3f _rotation, Eigen::Vector3f _translation) :
+                            monChantier(new Chantier(_monChantier)),
+                            nom(_nom),
+                            largeur(_largeur),
+                            hauteur(_hauteur),
+                            apparie(_apparie),
+                            tousPointsIm(_tousPointsIm),
+                            rotation(_rotation),
+                            translation(_translation)
+{
+    cout << "constructeur Panoramique" << endl;
+}
+
 
 Panoramique::~Panoramique()
 {
