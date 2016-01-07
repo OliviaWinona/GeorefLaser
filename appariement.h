@@ -1,5 +1,6 @@
 #ifndef APPARIEMENT_H
 #define APPARIEMENT_H
+
 #include <iostream>
 #include<vector>
 #include "panoramique.h"
@@ -7,14 +8,17 @@
 
 class Appariement
 {
+protected:
+    Panoramique * image1;
+    Panoramique * image2;
+    std::vector<Point*> listePoints;
+
 public:
-    Appariement();
-    Appariement(Panoramique _image1, Panoramique _image2, std::initializer_list<Point*> _lstPoints);
+    Appariement(Panoramique* pano1, Panoramique* pano2);
     ~Appariement();
 
-    Panoramique *image1;
-    Panoramique *image2;
-    std::vector<Point*> listePoints;
+    bool ChargeMesures();
+
 };
 
 #endif // APPARIEMENT_H

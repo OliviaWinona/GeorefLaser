@@ -1,25 +1,44 @@
 #ifndef CHANTIER_H
 #define CHANTIER_H
+
 #include <iostream>
 #include <vector>
-#include <libXBase/XErrorConsole.h>
+#include <libXBase/XError.h>
+#include <libXBase/XStringTools.h>
+#include <libXFileSystem/XPath.h>
+#include "appariement.h"
 
 class Panoramique;
 class Chantier
 {
+protected:
+    //Attributs
+    XError* m_error;
+    std::string m_strNomDossier;
+    std::vector<Panoramique*> m_listePano;
+    std::vector<Appariement*> m_listeAppariement;
+
+    //Outils
+    XStringTools st;
+    XPath P;
+
+    //Méthodes internes
+    bool InitPanos();
+    bool AddResult(std::string fileResult);
+    Panoramique* FindPano(std::string nom);
+
+
 public:
-    Chantier();
-    Chantier(std::string _nomDossier, int _nbIm, std::initializer_list<Panoramique*> _lstPano);
+    Chantier(XError* error);
     ~Chantier();
 
     // Méthodes
-    //void CreationListePano(std::string dossier, XErrorConsole &m_error);
-    bool CreationListePano(std::string dossier);
+    bool ChargePano(std::string dossier);
+    bool ChargeResult(std::string dossier);
 
     // Attributs
-    std::string nomDossier;
-    int nbIm = 0;
-    std::vector<Panoramique*> listePano;
+    int NbPanoramiques() ;
+    std::string Dossier(){return m_strNomDossier;}
 
 };
 

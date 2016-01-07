@@ -20,7 +20,6 @@ SOURCES += main.cpp \
     libXBase/XArchiTime.cpp \
     libXBase/XBBox.cpp \
     libXBase/XErrorTxt.cpp \
-    libXBase/XErrorXml.cpp \
     libXBase/XFrame.cpp \
     libXBase/XInterpolLin.cpp \
     libXBase/XMat3D.cpp \
@@ -50,7 +49,6 @@ HEADERS += \
     libXBase/XError.h \
     libXBase/XErrorConsole.h \
     libXBase/XErrorTxt.h \
-    libXBase/XErrorXml.h \
     libXBase/XFInterpol.h \
     libXBase/XFrame.h \
     libXBase/XInterpolLin.h \

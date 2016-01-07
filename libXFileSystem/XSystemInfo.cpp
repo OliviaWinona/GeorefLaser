@@ -13,14 +13,12 @@
 #include "libXBase/XStringTools.h"
 #include "libXFileSystem/XPath.h"
 #include <algorithm>
-#include <iostream>
-#include <windows.h>
 
 std::string ws2s(const std::wstring& wstr)
 {
-    int size_needed = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), int(wstr.length() + 1), 0, 0, 0, 0);
+    int size_needed = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), int(wstr.length() + 1), 0, 0, 0, 0); 
     std::string strTo(size_needed, 0);
-    WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), int(wstr.length() + 1), &strTo[0], size_needed, 0, 0);
+    WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), int(wstr.length() + 1), &strTo[0], size_needed, 0, 0); 
     return strTo;
 }
 //-----------------------------------------------------------------------------
@@ -59,7 +57,7 @@ void XSystemInfo::SubPathSep(std::string & path)
 //-----------------------------------------------------------------------------
 // Donne l'espace disque disponible dans un repertoire
 //-----------------------------------------------------------------------------
-double XSystemInfo::GetDiskFreeSpace(std::string path)
+/*double XSystemInfo::GetDiskFreeSpace(std::string path)
 {
 	typedef BOOL (CALLBACK* LPFNDLLFUNC1)(LPCTSTR, PULARGE_INTEGER,
 				  PULARGE_INTEGER , PULARGE_INTEGER );
@@ -68,7 +66,7 @@ double XSystemInfo::GetDiskFreeSpace(std::string path)
 	LPFNDLLFUNC1 lpfnDllFunc1;    // Pointeur de fonction
 	double diskSpace = 0.0;
 
-    hDLL = LoadLibrary((LPCWSTR)"Kernel32.dll");
+	hDLL = LoadLibrary("Kernel32.dll");
 	if (hDLL == NULL)
 		return 0;
 
@@ -76,7 +74,7 @@ double XSystemInfo::GetDiskFreeSpace(std::string path)
 	if (!lpfnDllFunc1)
 	{
 		DWORD SectorsPerCluster, BytesPerSector, NumberOfFreeClusters, TotalNumberOfClusters;
-        SetCurrentDirectory((LPCWSTR)path.c_str());
+		SetCurrentDirectory(path.c_str());
 		if (::GetDiskFreeSpace(NULL, &SectorsPerCluster, &BytesPerSector,
 			&NumberOfFreeClusters,&TotalNumberOfClusters) == TRUE) {
 			diskSpace = (double)(NumberOfFreeClusters * BytesPerSector * SectorsPerCluster);
@@ -84,7 +82,7 @@ double XSystemInfo::GetDiskFreeSpace(std::string path)
 		}
 	} else { //La fonction GetDiskFreeSpaceEx est connue
 		ULARGE_INTEGER FreeBytesAvailableToCaller,TotalNumberOfBytes,TotalNumberOfFreeBytes;
-        if (lpfnDllFunc1((LPCWSTR)path.c_str(),&FreeBytesAvailableToCaller,
+		if (lpfnDllFunc1(path.c_str(),&FreeBytesAvailableToCaller,
 						&TotalNumberOfBytes, &TotalNumberOfFreeBytes ) == TRUE) {
 			if (FreeBytesAvailableToCaller.HighPart > 0)
 				diskSpace = (double)FreeBytesAvailableToCaller.HighPart * 4096.0 +
@@ -96,13 +94,113 @@ double XSystemInfo::GetDiskFreeSpace(std::string path)
 	FreeLibrary(hDLL);
 	return diskSpace;
 }
+*/
+//-----------------------------------------------------------------------------
+//std::string XSystemInfo::BrowseForFolder(HWND hOwner,LPCSTR lpszTitle, UINT nFlags)
+//{
+//  std::string strResult = "";
+
+//  LPMALLOC lpMalloc;  // pointer to IMalloc
+
+//  if (::SHGetMalloc(&lpMalloc) != NOERROR)
+//     return strResult; // failed to get allocator
+
+//  char szDisplayName[_MAX_PATH];
+//  char szBuffer[_MAX_PATH];
+
+//  BROWSEINFO browseInfo;
+//  browseInfo.hwndOwner = hOwner;
+//  browseInfo.pidlRoot = NULL;
+//  browseInfo.pszDisplayName = szDisplayName;
+//  browseInfo.lpszTitle = lpszTitle;
+//  browseInfo.ulFlags = nFlags;
+//  browseInfo.lpfn = NULL;
+//  browseInfo.lParam = 0;
+
+//  LPITEMIDLIST lpItemIDList = ::SHBrowseForFolder(&browseInfo);
+//	if (lpItemIDList == NULL) {
+//		lpMalloc->Free(lpItemIDList);
+//		lpMalloc->Release();
+//		return strResult;
+//	}
+
+//	if (::SHGetPathFromIDList(lpItemIDList, szBuffer)){
+//    if (szBuffer[0] == '\0')
+//			return strResult;
+//    strResult = szBuffer;
+//    return strResult;
+//  } else
+//    return strResult; // strResult is empty
+
+//	lpMalloc->Free(lpItemIDList);
+//  lpMalloc->Release();
+
+//	return strResult;
+//}
+
+//-----------------------------------------------------------------------------
+int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM dwData)
+{
+ switch(uMsg) {
+  case BFFM_INITIALIZED:
+  {
+
+   SendMessage(hwnd, BFFM_SETSELECTION, 1, dwData);
+  }
+  break;
+
+ }
+
+ return 0;
+}
+
+
+//-----------------------------------------------------------------------------
+//int XSystemInfo::BrowseForFolderDefault(HWND hOwner,LPCSTR pszTitle, char* pszDirSel, bool CreateNewFolder)
+//{
+//	char szTmp[MAX_PATH];
+//	BROWSEINFO bi;
+//	int len = 0;
+//	LPMALLOC pMalloc;
+
+//	memset(&bi,0,sizeof(BROWSEINFO));
+//	// bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_DONTGOBELOWDOMAIN |BIF_VALIDATE | BIF_STATUSTEXT;
+//	if(CreateNewFolder)
+//		bi.ulFlags = 0x0040;
+//	else
+//		bi.ulFlags = 0x0040 | BIF_NONEWFOLDERBUTTON;
+//	bi.hwndOwner = hOwner;
+//	bi.lpszTitle = pszTitle;
+//	bi.lParam = (long) pszDirSel;
+//	bi.lpfn = BrowseCallbackProc;
+//	bi.pszDisplayName = szTmp;
+//	LPITEMIDLIST lpItemLst = SHBrowseForFolder(&bi);
+
+//	if(lpItemLst == NULL)
+//		return 0;
+
+//	if(SHGetPathFromIDList(lpItemLst, szTmp))
+//	{
+//		strcpy(pszDirSel, szTmp); len = (int)strlen(pszDirSel);
+//		if(pszDirSel[len - 1] != XPath::PathSep)
+//		{
+//			pszDirSel[len++] = XPath::PathSep;
+//			pszDirSel[len] = 0;
+//		}
+//	}
+//	if(SUCCEEDED(SHGetMalloc(&pMalloc)))
+//	{
+//		pMalloc->Free(lpItemLst); pMalloc->Release();
+//	}
+//	return len;
+//}
 
 //-----------------------------------------------------------------------------
 // Permet de tester l'existence d'un fichier
 //-----------------------------------------------------------------------------
 bool XSystemInfo::FindFile(const char* filename)
 {
-	WIN32_FIND_DATA findData;
+    WIN32_FIND_DATA findData;
     HANDLE file = FindFirstFile((LPCWSTR)filename, &findData);
 	if (file == INVALID_HANDLE_VALUE)
 		return false;	// Le fichier n'existe pas
@@ -110,20 +208,17 @@ bool XSystemInfo::FindFile(const char* filename)
 	return true;
 }
 //-----------------------------------------------------------------------------
-// Permet de tester l'existence d'un r√©pertoire
+// Permet de tester l'existence d'un rÈpertoire
 //-----------------------------------------------------------------------------
 bool XSystemInfo::FindFolder(std::string folder)
 {
 	if (folder.size() == 0)
 		return false;
-    SubPathSep(folder);
+	SubPathSep(folder);		
 
-    LPWIN32_FIND_DATAW findData;
-    HANDLE file = FindFirstFile((LPCWSTR)folder.c_str(), findData);
-    std::cout << findData << std::endl;
-    std::cout << file << std::endl;
+	WIN32_FIND_DATA findData;
+    HANDLE file = FindFirstFile((LPCWSTR)folder.c_str(), &findData);
 	if (file == INVALID_HANDLE_VALUE)// Le repertoire n'existe pas
-        std::cout << "je suis dans ce if" << std::endl;
 		return false;
 	FindClose(file);
 
@@ -135,6 +230,66 @@ bool XSystemInfo::Copy_File(const char* src, const char* dst, bool FailIfExist)
     return ::CopyFile((LPCWSTR)src,(LPCWSTR)dst,FailIfExist);
 }
 
+//-----------------------------------------------------------------------------
+// Copie du contenu d'un repertoire dans un autre
+//-----------------------------------------------------------------------------
+//bool XSystemInfo::CopyDirContent(const char* src, const char* dst, bool FailIfExist)
+//{
+//	std::string strSrc = src;
+//	std::string strDst = dst;
+//	AddPathSep(strSrc);
+//	AddPathSep(strDst);
+
+//	std::string	oldFile, newFile, strPath = strSrc + "*.*";
+
+//	HANDLE hFind;
+//	WIN32_FIND_DATA fd;
+
+//  if ((hFind = ::FindFirstFile ((LPCWSTR)strPath.c_str(), &fd)) != INVALID_HANDLE_VALUE) {
+//		if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+//            newFile = strDst + fd.cFileName;
+//            oldFile = strSrc + fd.cFileName;
+//            ::CopyFile((LPCWSTR)oldFile.c_str(), (LPCWSTR)newFile.c_str(), FailIfExist);
+//		}
+//	}
+//	else
+//		return false;
+
+//	while (::FindNextFile (hFind, &fd)) {
+//		if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+//            newFile = strDst + fd.cFileName;
+//            oldFile = strSrc + fd.cFileName;
+//            ::CopyFile((LPCWSTR)oldFile.c_str(), (LPCWSTR)newFile.c_str(), FailIfExist);
+//		}
+//	}
+//	::FindClose(hFind);
+//	return true;
+//}
+
+
+//-----------------------------------------------------------------------------
+// Retourne la taille d'un fichier < 4Go (-1 si pb) 
+//-----------------------------------------------------------------------------
+long long XSystemInfo::GetFileSize1(const char* src)
+{
+	std::ifstream fic(src);
+	if (!fic.good())
+		return 0;
+	fic.seekg(0, std::ios::end);
+
+	return fic.tellg();
+	/*auutre code
+	FILE * f = fopen(src,"rb");
+	if(f==NULL)	
+		return -1;
+
+	fseek(f, 0, SEEK_END);
+    _int64 fSize = ftell(f);
+    fclose(f);
+	return fSize;
+
+	*/
+}
 //-----------------------------------------------------------------------------
 // Retourne la taille d'un fichier dans un double 
 //-----------------------------------------------------------------------------
@@ -151,7 +306,7 @@ double XSystemInfo::GetFileSize2(const char* src)
 	double quad = fileSize.QuadPart;
 
 	CloseHandle( fileHandle);	
-	return (double)(__int64)fileSize.QuadPart;
+    return (double)fileSize.QuadPart;
 
 
 }
@@ -208,7 +363,7 @@ int XSystemInfo::CountFileInFolder(std::string folder, std::string filtre)
 	::FindClose(hFind);
 	return nCount;
 }
-//+ rapide que CountFileInFolder ( utilis√© pour connaitre approximativement le nombre d√©l√©ments d'un repertoire)
+//+ rapide que CountFileInFolder ( utilisÈ pour connaitre approximativement le nombre dÈlÈments d'un repertoire)
 //-----------------------------------------------------------------------------
 int XSystemInfo::CountElementsInFolder(std::string folder)
 {
@@ -249,25 +404,42 @@ bool XSystemInfo::NumberofElementsInFolderIsGreaterThan(std::string folder, int 
 	::FindClose(hFind);
 	return true;
 }
-
+//-----------------------------------------------------------------------------
+// Renvoie la liste des fichiers d'un repertoire incluant tous les sous rÈpertoires
+//-----------------------------------------------------------------------------
+//void XSystemInfo::GetFileListInAllSubFolder(std::string folder, std::vector<std::string> &liste, std::string filtre)
+//{
+//	std::vector<std::string> lstSubFolder = GetSubFolderListInFolder(folder);
+//	uint32 nbSub = lstSubFolder.size();
+//	lstSubFolder.push_back(folder);
+		
+//	for(uint32 i=0; i < lstSubFolder.size(); i++)
+//	{
+//		std::vector<std::string> vecfiles;
+//		GetFileListInFolder(lstSubFolder[i],vecfiles,filtre.c_str());
+//		for(uint32 j=0; j < vecfiles.size(); j++)
+//			liste.push_back(vecfiles[j]);
+		
+//	}
+//}
 //-----------------------------------------------------------------------------
 // Renvoie la liste des fichiers d'un repertoire
 //-----------------------------------------------------------------------------
 bool XSystemInfo::GetFileListInFolder(std::string folder, std::vector<std::string> &liste, std::string filtre, bool sort)
 {
-/*	std::string strFolder = folder;
+	std::string strFolder = folder;
 	AddPathSep(strFolder);
 
 	std::string strPath = strFolder + filtre;
 
 	HANDLE hFind;
-	WIN32_FIND_DATA fd;
+    LPWIN32_FIND_DATAW fd;
 
-    if ((hFind = ::FindFirstFile ((LPCWSTR)strPath.c_str(), &fd)) != INVALID_HANDLE_VALUE)
+    if ((hFind = ::FindFirstFile ((LPCWSTR)strPath.c_str(), fd)) != INVALID_HANDLE_VALUE)
 	{
-		if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+        if (!(fd->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 		{
-            liste.push_back((LPCWSTR)strFolder + fd.cFileName);
+            liste.push_back(strFolder + ws2s(fd->cFileName));
 		}
 	}
 	else
@@ -275,51 +447,102 @@ bool XSystemInfo::GetFileListInFolder(std::string folder, std::vector<std::strin
 		return false;
 	}
 
-	while (::FindNextFile (hFind, &fd))
+    while (::FindNextFile (hFind, fd))
 	{
-		if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+        if (!(fd->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 		{
-            liste.push_back((LPCWSTR)strFolder + fd.cFileName);
+            liste.push_back(strFolder + ws2s(fd->cFileName));
 		}
 	}
 	::FindClose(hFind);
 	if(sort)
-        std::sort(liste.begin(),liste.end());*/
-
+		std::sort(liste.begin(),liste.end());
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+// Renvoie la liste des fichiers d'un repertoire
+//-----------------------------------------------------------------------------
+//std::vector<std::string> XSystemInfo::GetSubFolderListInFolder(std::string folder, bool multiLevel)
+//{
+//	std::vector<std::string> liste;
+//	std::string strFolder = folder;
+//	AddPathSep(strFolder);
 
+//	std::string strPath = strFolder + "*.*";
+
+//	HANDLE hFind;
+//	WIN32_FIND_DATA fd;
+//	std::string name;
+
+//    if ((hFind = ::FindFirstFile ((LPCWSTR)strPath.c_str(), &fd)) != INVALID_HANDLE_VALUE)
+//	{
+//		name = fd.cFileName;
+////		if (fd.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)
+//		if ((fd.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)||(fd.dwFileAttributes == 48)||(fd.dwFileAttributes == 8240)||(fd.dwFileAttributes == 8208))
+//		{
+//			if((name != ".")&&(name != ".."))
+//				liste.push_back(strFolder + fd.cFileName+ XPath::PathSep);
+//		}
+//	}
+//	else
+//	{
+//		return liste;
+//	}
+
+//	while (::FindNextFile (hFind, &fd))
+//	{
+//		name = fd.cFileName;
+////		if (fd.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)
+//		if ((fd.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)||(fd.dwFileAttributes == 48)||(fd.dwFileAttributes == 8240)||(fd.dwFileAttributes == 8208))
+//		{
+//			if((name != ".")&&(name != ".."))
+//				liste.push_back(strFolder + fd.cFileName + XPath::PathSep);
+//		}
+//	}
+//	::FindClose(hFind);
+//	int fin = (int)liste.size();
+//	if(multiLevel)
+//	{
+//		for(int i=0; i < fin; i++)
+//		{
+//			std::vector<std::string> tmp = GetSubFolderListInFolder(liste[i], true);
+//			if(!tmp.empty())
+//				liste.insert(liste.end(), tmp.begin(), tmp.end());
+//		}
+//	}
+
+//	return liste;
+//}
 //-----------------------------------------------------------------------------
 std::string XSystemInfo::GetExePath()
 {
     wchar_t buf[MAX_PATH];
-    //char buf[MAX_PATH];
-    DWORD count = ::GetModuleFileNameW(NULL, buf, MAX_PATH);
-    std::string test = ws2s(buf) ;
-    return test.substr(0, test.rfind('\\'));;
+	DWORD count = ::GetModuleFileName(NULL, buf,MAX_PATH);
+    std::string path = ws2s(buf);
+	return path.substr(0, path.rfind('\\'));
 }
 //-----------------------------------------------------------------------------
 std::string XSystemInfo::GetTempFileName(std::string contexte)
 {
-/*	if(contexte.empty())
+	if(contexte.empty())
 		contexte = "tmp";
 
-	char filename[MAX_PATH], path[MAX_PATH];
+    wchar_t filename[MAX_PATH];
+    wchar_t path[MAX_PATH];
 	::GetTempPath(MAX_PATH, path);
-	::GetTempFileName(path ,contexte.c_str(), 0, filename);
-    return std::string(filename);*/
-    return std::string();
+    ::GetTempFileName(path ,(LPCWSTR)contexte.c_str(), 0, filename);
+    return ws2s(filename);
 }
 //-----------------------------------------------------------------------------
 std::string XSystemInfo::GetTempPath()
 {
-    std::wstring path;
-    ::GetTempPath(MAX_PATH, (LPWSTR)path.c_str());
+    wchar_t path[MAX_PATH];
+	::GetTempPath(MAX_PATH, path);
     return ws2s(path);
 }
 //-----------------------------------------------------------------------------
-// Renvoie la date syst√®me sous la forme yyyy:mm:dd
+// Renvoie la date systËme sous la forme yyyy:mm:dd
 //-----------------------------------------------------------------------------
 std::string XSystemInfo::DateSysteme(std::string sep)
 {
@@ -330,7 +553,7 @@ std::string XSystemInfo::DateSysteme(std::string sep)
 	return std::string(date);
 }
 //-----------------------------------------------------------------------------
-// Renvoie l'heure syst√®me sous la forme hh:mm:ss
+// Renvoie l'heure systËme sous la forme hh:mm:ss
 //-----------------------------------------------------------------------------
 std::string XSystemInfo::HeureSysteme(std::string sep)
 {
@@ -352,68 +575,81 @@ void XSystemInfo::System_Time(std::string &strDate, std::string & strHeure)
 	strDate = date;
 	strHeure = heure;
 }
+//-----------------------------------------------------------------------------
+__int64 XSystemInfo::GetLocalTimeStamp()//l'unitÈ correspond ‡ un interval de 100 ns
+{
+	SYSTEMTIME stLocalTime;
+	GetLocalTime(&stLocalTime);
 
+	FILETIME ftLocalTime;
+	SystemTimeToFileTime(&stLocalTime, &ftLocalTime);
+	
+	LARGE_INTEGER TempFt;
+	TempFt.HighPart =  ftLocalTime.dwHighDateTime;
+	TempFt.LowPart =  ftLocalTime.dwLowDateTime;
+
+	return TempFt.QuadPart;
+}
 //-----------------------------------------------------------------------------
 // Compte le nombre de fichier dans une arborescence
 //-----------------------------------------------------------------------------
-int XSystemInfo::CountFileInTree(std::string Path)
-{
-/*	std::string path = Path;
-	if (path.size() < 1)
-		return 0;
+//int XSystemInfo::CountFileInTree(std::string Path)
+//{
+//	std::string path = Path;
+//	if (path.size() < 1)
+//		return 0;
 
-	AddPathSep(path);
+//	AddPathSep(path);
 
-	std::string find_path = path + "*.*";
+//	std::string find_path = path + "*.*";
 
- 	HANDLE hFind;
-  WIN32_FIND_DATA fd;
-  int nCount = 0;
- if ((hFind = ::FindFirstFile (find_path.c_str(), &fd)) != INVALID_HANDLE_VALUE) {
-		if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-			nCount++;
-		else {
-			std::string filename = fd.cFileName;
-			if ((filename.compare(".") != 0) && (filename.compare("..") != 0))
-				nCount += CountFileInTree(path + filename);
-		}
-	}
-	else
-		return 0;
+// 	HANDLE hFind;
+//  WIN32_FIND_DATA fd;
+//  int nCount = 0;
+// if ((hFind = ::FindFirstFile (find_path.c_str(), &fd)) != INVALID_HANDLE_VALUE) {
+//		if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+//			nCount++;
+//		else {
+//			std::string filename = fd.cFileName;
+//			if ((filename.compare(".") != 0) && (filename.compare("..") != 0))
+//				nCount += CountFileInTree(path + filename);
+//		}
+//	}
+//	else
+//		return 0;
 
-	while (::FindNextFile (hFind, &fd)) {
-		if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-			nCount++;
-		else{
-			std::string filename = fd.cFileName;
-			if ((filename.compare(".") != 0) && (filename.compare("..") != 0))
-				nCount += CountFileInTree(path + filename);
-		}
-	}
-	::FindClose(hFind);
-    return nCount;*/
-    return 0;
-}
+//	while (::FindNextFile (hFind, &fd)) {
+//		if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+//			nCount++;
+//		else{
+//			std::string filename = fd.cFileName;
+//			if ((filename.compare(".") != 0) && (filename.compare("..") != 0))
+//				nCount += CountFileInTree(path + filename);
+//		}
+//	}
+//	::FindClose(hFind);
+//	return nCount;
+//}
 //-----------------------------------------------------------------------------
 bool XSystemInfo::DeleteFolder(std::string folder)
 {
 	if (folder[folder.length()-1] == '\\')
 		folder = folder.substr(0,folder.length()-1);
-    return ::RemoveDirectory((LPWSTR)folder.c_str());
+    return ::RemoveDirectory((LPCWSTR)folder.c_str());
 }
 //-----------------------------------------------------------------------------
 bool XSystemInfo::DeleteFichier(std::string fichier)
 {
-    return ::DeleteFile((LPWSTR)fichier.c_str());
+    return ::DeleteFile((LPCWSTR)fichier.c_str());
 }
 
 //-----------------------------------------------------------------------------
-bool XSystemInfo::FullDeleteFolder(std::string folder)
-{
-	if(FullEmptyFolder(folder) == -1)
-		return false;
-    return DeleteFolder(folder);
-}
+//bool XSystemInfo::FullDeleteFolder(std::string folder)
+//{
+//	if(FullEmptyFolder(folder) == -1)
+//		return false;
+//	return DeleteFolder(folder);
+//}
 //-----------------------------------------------------------------------------
 bool XSystemInfo::RenameFolder(std::string folder, std::string newName)
 {
@@ -423,132 +659,130 @@ bool XSystemInfo::RenameFolder(std::string folder, std::string newName)
 }
 
 //-----------------------------------------------------------------------------
-//D√©truit tout les fichiers d'un r√©pertoire (pas les sous-r√©pertoires !)
+//DÈtruit tout les fichiers d'un rÈpertoire (pas les sous-rÈpertoires !)
 //-----------------------------------------------------------------------------
-int XSystemInfo::EmptyFolder(std::string folder)
-{
-    /*if (folder.size() < 1)
-		return -1;
-	AddPathSep(folder);
+//int XSystemInfo::EmptyFolder(std::string folder)
+//{
+//	if (folder.size() < 1)
+//		return -1;
+//	AddPathSep(folder);
 
-	std::string Path = folder + "*.*";
-	std::string fileName;
+//	std::string Path = folder + "*.*";
+//	std::string fileName;
 
-	int nbDelete = 0;
+//	int nbDelete = 0;
 
-	HANDLE file;
-	WIN32_FIND_DATA fd;
-	bool pb = false;
+//	HANDLE file;
+//	WIN32_FIND_DATA fd;
+//	bool pb = false;
 
-  if ((file = ::FindFirstFile (Path.c_str(), &fd)) != INVALID_HANDLE_VALUE) {
-		if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-			fileName = folder;
-			fileName += fd.cFileName;
-			if(::DeleteFile(fileName.c_str()))
-				nbDelete++;
-			else
-				pb = true;
-		}
-	}
-	else
-		return 0;
+//  if ((file = ::FindFirstFile (Path.c_str(), &fd)) != INVALID_HANDLE_VALUE) {
+//		if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+//			fileName = folder;
+//			fileName += fd.cFileName;
+//			if(::DeleteFile(fileName.c_str()))
+//				nbDelete++;
+//			else
+//				pb = true;
+//		}
+//	}
+//	else
+//		return 0;
 
-	while (::FindNextFile (file, &fd)) {
-		if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-			fileName = folder;
-			fileName += fd.cFileName;
-			if(::DeleteFile(fileName.c_str()))
-				nbDelete++;
-			else
-				pb = true;
-		}
-	}
-	::FindClose(file);
-	if(pb)
-		return -1;
+//	while (::FindNextFile (file, &fd)) {
+//		if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+//			fileName = folder;
+//			fileName += fd.cFileName;
+//			if(::DeleteFile(fileName.c_str()))
+//				nbDelete++;
+//			else
+//				pb = true;
+//		}
+//	}
+//	::FindClose(file);
+//	if(pb)
+//		return -1;
 
-    return nbDelete;*/
-    return 0;
-}
+//	return nbDelete;
+//}
 //-----------------------------------------------------------------------------
-//D√©truit tout le contenu d'un r√©pertoire (y compris les sous-r√©pertoires !)
+//DÈtruit tout le contenu d'un rÈpertoire (y compris les sous-rÈpertoires !)
 //-----------------------------------------------------------------------------
-int XSystemInfo::FullEmptyFolder(std::string folder)
-{
-/*	if (folder.size() < 1)
-		return -1;
-	if (folder[folder.length()-1] != XPath::PathSep)
-		folder += XPath::PathSep;
+//int XSystemInfo::FullEmptyFolder(std::string folder)
+//{
+//	if (folder.size() < 1)
+//		return -1;
+//	if (folder[folder.length()-1] != XPath::PathSep)
+//		folder += XPath::PathSep;
 
-	std::string Path = folder + "*.*";
-	std::string fileName;
+//	std::string Path = folder + "*.*";
+//	std::string fileName;
 
-	int nbDelete = 0;
+//	int nbDelete = 0;
 
-	HANDLE file;
-	WIN32_FIND_DATA fd;
-	bool pb = false;
+//	HANDLE file;
+//	WIN32_FIND_DATA fd;
+//	bool pb = false;
 
-  if ((file = ::FindFirstFile (Path.c_str(), &fd)) == INVALID_HANDLE_VALUE) 
-	  return 0;
+//  if ((file = ::FindFirstFile (Path.c_str(), &fd)) == INVALID_HANDLE_VALUE)
+//	  return 0;
   
-	fileName = fd.cFileName;
-	if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-		if(::DeleteFile((folder+fileName).c_str()))
-			nbDelete++;
-		else
-			pb = true;
-	}
-	else
-	{
-		if ((fileName.compare(".") != 0) && (fileName.compare("..") != 0))
-		{
-			nbDelete+= FullEmptyFolder(folder+fileName);
-			if(DeleteFolder(folder+fileName))
-				nbDelete++;
-			else
-				pb = true;
-		}
-	}
+//	fileName = fd.cFileName;
+//	if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+//		if(::DeleteFile((folder+fileName).c_str()))
+//			nbDelete++;
+//		else
+//			pb = true;
+//	}
+//	else
+//	{
+//		if ((fileName.compare(".") != 0) && (fileName.compare("..") != 0))
+//		{
+//			nbDelete+= FullEmptyFolder(folder+fileName);
+//			if(DeleteFolder(folder+fileName))
+//				nbDelete++;
+//			else
+//				pb = true;
+//		}
+//	}
 	
 	
 
-	while (::FindNextFile (file, &fd)) {
-		fileName = fd.cFileName;
-		if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-			if(::DeleteFile((folder+fileName).c_str()))
-				nbDelete++;
-			else
-				pb = true;
-		}
-		else
-		{
-			if ((fileName.compare(".") != 0) && (fileName.compare("..") != 0))
-			{
-				nbDelete+= FullEmptyFolder(folder+fileName);
-				if(DeleteFolder(folder+fileName))
-					nbDelete++;
-				else
-					pb = true;
-			}
-		}
-	}
-	::FindClose(file);
-	if(pb)
-		return -1;
+//	while (::FindNextFile (file, &fd)) {
+//		fileName = fd.cFileName;
+//		if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+//			if(::DeleteFile((folder+fileName).c_str()))
+//				nbDelete++;
+//			else
+//				pb = true;
+//		}
+//		else
+//		{
+//			if ((fileName.compare(".") != 0) && (fileName.compare("..") != 0))
+//			{
+//				nbDelete+= FullEmptyFolder(folder+fileName);
+//				if(DeleteFolder(folder+fileName))
+//					nbDelete++;
+//				else
+//					pb = true;
+//			}
+//		}
+//	}
+//	::FindClose(file);
+//	if(pb)
+//		return -1;
 
-    return nbDelete;*/
-    return 0;
-}
+//	return nbDelete;
+//}
 //---------------------------------------------------------------------------
 bool XSystemInfo::CreateDirectoryIfNotExist(const char* FullDirecotryPath )
 {
 	std::string path = FullDirecotryPath;
 	if(FindFolder(path))
 		return true;
-    std::string toto1(FullDirecotryPath);
-    std::wstring toto2(toto1.begin(),toto1.end());
-    return CreateDirectory((LPWSTR)FullDirecotryPath , NULL);
+    wchar_t buffer[1024];
+   // swprintf(buffer,1024,"%ls",(LPCWSTR)FullDirecotryPath);
+    return CreateDirectory((LPCWSTR)buffer , NULL);
 }
 
 
@@ -564,7 +798,7 @@ bool  XSystemInfo::CreateMultiDirectory(const char* FullDirecotryPath )
 	path="";
 	for(std::vector<std::string>::iterator it=directory.begin();it<directory.end();it++)
 	{
-		if((*it)[1]==':')//On va eviter de cr√©er un disque...
+		if((*it)[1]==':')//On va eviter de crÈer un disque...
 		{
 			path+=(*it);
 			continue;
@@ -573,7 +807,7 @@ bool  XSystemInfo::CreateMultiDirectory(const char* FullDirecotryPath )
 		path+=(*it);
 		if( FindFolder(path))
 			continue;
-        if( CreateDirectory( (LPWSTR)path.c_str() , NULL) != TRUE)
+        if( CreateDirectory( (LPCWSTR)path.c_str() , NULL) != TRUE)
 			return false;
 	}
     return true;
@@ -582,17 +816,17 @@ bool  XSystemInfo::CreateMultiDirectory(const char* FullDirecotryPath )
 std::string XSystemInfo::ComputerName()
 {
 	DWORD buf_size = 1024;
-	char buffer[1024];
-    if (::GetComputerName((LPWSTR)buffer,&buf_size)== FALSE)
+    wchar_t buffer[1024];
+	if (::GetComputerName(buffer,&buf_size)== FALSE)
 		return std::string();
-	return std::string(buffer);
+    return ws2s(buffer);
 }
-//R√©pertoire de l'executable---------------------------------------------------------------------------
+//RÈpertoire de l'executable---------------------------------------------------------------------------
 std::string  XSystemInfo::GetCurrentExe()
-{
-    wchar_t buf[MAX_PATH];
-    DWORD count = ::GetModuleFileName(NULL, buf, MAX_PATH);
-    return ws2s(buf);
+{ ///syntaxe unicode wide char
+	wchar_t buf[MAX_PATH];
+	DWORD count = ::GetModuleFileNameW(NULL, buf, 2000);
+	return ws2s(buf);
 }
 //---------------------------------------------------------------------------
 std::string XSystemInfo::CreateLogFile(std::ofstream* log, const char * extension)
@@ -603,26 +837,26 @@ std::string XSystemInfo::CreateLogFile(std::ofstream* log, const char * extensio
 	std::string AppName = p.NameNoExt(AppPath.c_str());
 
 	std::string folder = p.Path(AppPath.c_str()) + XPath::PathSep + "Journal_" + AppName;
-	if (!CreateDirectoryIfNotExist(folder.c_str()))
-		return std::string();
+//	if (!CreateDirectoryIfNotExist(folder.c_str()))
+//		return std::string();
 	folder += XPath::PathSep;
 
 	//date
-	char buf[1024];
+    wchar_t buf[1024];
 	int nblogToday = 0;
 	do {
-		sprintf(buf,"%s%s_%s_%s_%d.%s",folder.c_str(),AppName.c_str(),ComputerName().c_str(),DateSysteme(std::string("_")).c_str(),nblogToday,extension);
+        wprintf(buf,"%s%s_%s_%s_%d.%s",folder.c_str(),AppName.c_str(),ComputerName().c_str(),DateSysteme(std::string("_")).c_str(),nblogToday,extension);
 		nblogToday++;
-    } while(::GetFileAttributes((LPWSTR)buf)!=0xFFFFFFFF);//enddo
+	} while(::GetFileAttributes(buf)!=0xFFFFFFFF);//enddo
 
 
 
-	log->open(buf, std::ios_base::out);
+    log->open(ws2s(buf), std::ios_base::out);
 	if(!log->good())
         return std::string();
 	log->setf(std::ios_base::unitbuf);
 
-	return std::string(buf);
+    return ws2s(buf);
 
 }
 //---------------------------------------------------------------------------
@@ -633,7 +867,7 @@ bool XSystemInfo::CopyFileInFolder(const char* fullFilename, const char* folderD
 
 	XPath p;
 	std::string newFilename = dest + p.Name(fullFilename);
-    return ::CopyFile((LPWSTR)fullFilename,(LPWSTR)newFilename.c_str(),FALSE);
+    return ::CopyFile((LPCWSTR)fullFilename,(LPCWSTR)newFilename.c_str(),FALSE);
 }
 //---------------------------------------------------------------------------
 bool XSystemInfo::IsMachineFormatLittleEndian()
@@ -705,7 +939,7 @@ SIZE_T XSystemInfo::GetLargestFreeMemRegion(LPVOID *lpBaseAddr)
 		else
 		{
 	//       if (showMemInfo)
-	//         _tprintf(_T(‚Äù### VirtualQuery failed (%p)n‚Äù), p);
+	//         _tprintf(_T(î### VirtualQuery failed (%p)nî), p);
 		p = (void*) (((char*)p) + systemInfo.dwPageSize);
 		}
 	}
@@ -739,7 +973,7 @@ void XSystemInfo::SleepT(unsigned long milliSeconds)
 {
 	Sleep(milliSeconds);
 	/*
-	a impl√©menter dans la version unix avec 
+	a implÈmenter dans la version unix avec 
 	#include <unistd.h>
 	 usleep(100*1e3);
 	 */
@@ -754,6 +988,6 @@ bool XSystemInfo::TestWrintingOnFolder(std::string folder)
 	std::ofstream test(testfile.c_str());
 	if(!test)
 		return false;
-    ::DeleteFile((LPWSTR)testfile.c_str());
+    ::DeleteFile((LPCWSTR)testfile.c_str());
 	return true;
 }

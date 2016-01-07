@@ -10,9 +10,9 @@ public:
     ~Point();
 
     int num;
-    int x;
-    int y;
-    int z;
+    float x;
+    float y;
+    float z;
 };
 
 #endif // POINT_H
