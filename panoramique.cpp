@@ -5,15 +5,16 @@
 #include <cmath>
 #include <Eigen/Dense>
 #include <string>
+#include <libXBase/XStringTools.h>
 #include "appariement.h"
 #include "chantier.h"
 
 
 Panoramique::~Panoramique(){;}
 //------------------------------------------------------------
-std::string Panoramique::Nom(){return m_strNom;}
-//------------------------------------------------------------
 Chantier* Panoramique::Chantier(){return pChantier;}
+//------------------------------------------------------------
+
 //------------------------------------------------------------
 long GetFileSize(std::ifstream &Fichier)
 {
@@ -28,7 +29,6 @@ long GetFileSize(std::ifstream &Fichier)
     return size;
 }
 //------------------------------------------------------------
-
 long GetFileHauteur(long size)
 {
     //Pour fichier binaire sur 4 octets
@@ -42,15 +42,32 @@ bool Panoramique::calculLargHaut()
     if (!file.is_open())
         return false;
 
-     long size = GetFileSize(file);
-     hauteur = GetFileHauteur(size);
-     largeur = hauteur * 2;
+    long size = GetFileSize(file);
+    m_hauteur = GetFileHauteur(size);
+    m_largeur = m_hauteur * 2;
+    file.close();
     return true;
+}
+//------------------------------------------------------------
+bool Panoramique::ChargeCarteProfondeur()
+{
+    std::string name = pChantier->Dossier() + "\\" + Nom()+".bin";
+    std::ifstream file(name.c_str(), std::ios::in|std::ios::binary);
+    if(!file.is_open())
+        return false;
+
+    m_carteProfondeur.resize(m_largeur * m_hauteur,0);
+    file.read((char*)&m_carteProfondeur[0], sizeof(float)*m_largeur*m_hauteur);
+    file.close();
 }
 //------------------------------------------------------------
 bool Panoramique::Init(XError* error)
 {
     if(!calculLargHaut())
         return XErrorError(error,__FUNCTION__,"Erreur de calcul des dimensions ",m_strNom.c_str());
+
+    if(!ChargeCarteProfondeur())
+        return XErrorError(error,__FUNCTION__,"Erreur de chargement de la carte de profondeur",m_strNom.c_str());
+
     return true;
 }

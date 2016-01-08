@@ -18,25 +18,32 @@ protected:
     //Attributs
     std::string m_strNom;
     Chantier* pChantier;
-    long largeur;
-    long hauteur;
-    std::vector<Appariement*> apparie;
-    std::vector<Point*> tousPointsIm;
-    Eigen::Matrix3f rotation;
-    Eigen::Vector3f translation;
-    //float carteProfondeur[][];
+    long m_largeur;
+    long m_hauteur;
+    std::vector<Appariement*> m_apparie;
+    std::vector<Point*> m_tousPointsIm;
+    Eigen::Matrix3f m_rotation;
+    Eigen::Vector3f m_translation;
+    std::vector<float> m_carteProfondeur;
 
     //Méthode
     bool calculLargHaut();
+    bool ChargeCarteProfondeur();
 
 public:
     Panoramique(Chantier* parent,std::string nom){pChantier = parent;m_strNom = nom;}
     ~Panoramique();
 
-     //Attributs
-    Chantier* Chantier();
-    std::string Nom();
+    // Surcharge
+    //bool operator==(Panoramique & P2){return m_strNom == P2.Nom();}
 
+    //Attributs
+    Chantier* Chantier();
+    std::string Nom() {return m_strNom;}
+    long Hauteur() {return m_hauteur;}
+    long Largeur() {return m_largeur;}
+
+    //Méthodes
     bool Init(XError* error);
 };
 

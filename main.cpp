@@ -65,7 +65,7 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    cout << "FIN" << endl;
+    XErrorCommentaire(m_error,__FUNCTION__, "FIN");
     return 0;
 }
 

@@ -10,8 +10,8 @@ public:
     ~Point();
 
     int num;
-    float x;
-    float y;
+    float ligne;
+    float colonne;
     float z;
 };
 

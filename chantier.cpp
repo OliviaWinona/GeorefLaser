@@ -22,14 +22,15 @@ Chantier::~Chantier()
 }
 //------------------------------------------------------------
 int Chantier::NbPanoramiques() {return m_listePano.size();}
-
 //------------------------------------------------------------
 bool Chantier::InitPanos()
 {
+    bool ok;
     for(uint32 i=0; i< NbPanoramiques(); i++)
     {
-        m_listePano[i]->Init(m_error);
+        ok = m_listePano[i]->Init(m_error);
     }
+    return ok;
 }
 //------------------------------------------------------------
 bool Chantier::ChargePano(std::string dossier)
@@ -55,7 +56,6 @@ bool Chantier::ChargePano(std::string dossier)
     for (int i=0; i < contenuDossier.size(); i++){
         if(P.Extension(contenuDossier[i].c_str()) == "tif"){
             std::string nomPano = P.NameNoExt(contenuDossier[i].c_str());
-            cout << "Nom de l'image : " << nomPano << endl;
             std::string nomCarteProfondeur = nomPano+".bin";
             if(std::find(contenuDossier.begin(), contenuDossier.end(), nomCarteProfondeur) == contenuDossier.end())
             {
@@ -63,6 +63,8 @@ bool Chantier::ChargePano(std::string dossier)
                 continue;
             }
             m_listePano.push_back(new Panoramique(this,nomPano));
+            sprintf(message,"Creation de la pano : %s",nomPano.c_str());
+            XErrorInfo(m_error,__FUNCTION__,message);
         }
     }
     if (m_listePano.size() == 0)
@@ -75,22 +77,31 @@ bool Chantier::ChargePano(std::string dossier)
 //------------------------------------------------------------
 Panoramique* Chantier::FindPano(std::string nom)
 {
+    //if(std::find(m_listePano.begin(), m_listePano.end(), Panoramique(nom)))
+    for (int i=0 ; i<m_listePano.size() ; i++)
+    {
+        if (m_listePano[i]->Nom() == nom)
+            return m_listePano[i];
+    }
     return NULL;
 }
 //------------------------------------------------------------
 bool Chantier::AddResult(std::string fileResult)
 {
-    std::string name = P.NameNoExt(fileResult.c_str());
+    std::string name = fileResult.substr(0, fileResult.size()-7);
     //decoupage du nom
-    std::string nom1 ="";
-    std::string nom2 ="";
+    std::vector<std::string> decoupage;
+    std::string delimiteur = ".-.";
+    st.Tokenize(name, decoupage, delimiteur);
+    std::string nom1 = decoupage[0];
+    std::string nom2 = decoupage[1];
 
     Panoramique* pano1 = FindPano(nom1);
     if(pano1 == NULL)
-        return XErrorError(m_error,__FUNCTION__,"non trouve ",nom1.c_str());
+        return XErrorError(m_error,__FUNCTION__,"Pano non trouve ",nom1.c_str());
     Panoramique* pano2 = FindPano(nom2);
     if(pano2 == NULL)
-        return XErrorError(m_error,__FUNCTION__,"non trouve ",nom2.c_str());
+        return XErrorError(m_error,__FUNCTION__,"Pano non trouve ",nom2.c_str());
     Appariement* app = new Appariement(pano1,pano2);
     m_listeAppariement.push_back(app);
     return true;
@@ -98,7 +109,6 @@ bool Chantier::AddResult(std::string fileResult)
 //------------------------------------------------------------
 bool Chantier::ChargeResult(std::string dossier)
 {
-    XErrorInfo(m_error,__FUNCTION__,"Analyse du dossier",dossier.c_str());
     std::vector<std::string> contenuDossier;
     DIR * rep = opendir(dossier.c_str());
     if (rep != NULL)
