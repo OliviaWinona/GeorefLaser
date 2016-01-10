@@ -71,13 +71,13 @@ bool Chantier::ChargePano(std::string dossier)
         return XErrorError(m_error,__FUNCTION__,"pas d'image dans ce dossier ",dossier.c_str());
 
     m_strNomDossier = dossier;
-    XErrorInfo(m_error,__FUNCTION__,"NB image ",st.itoa(m_listePano.size()).c_str());
+    XErrorInfo(m_error,__FUNCTION__,"NB images",st.itoa(m_listePano.size()).c_str());
     return InitPanos();
 }
 //------------------------------------------------------------
+//------------------------------------------------------------
 Panoramique* Chantier::FindPano(std::string nom)
 {
-    //if(std::find(m_listePano.begin(), m_listePano.end(), Panoramique(nom)))
     for (int i=0 ; i<m_listePano.size() ; i++)
     {
         if (m_listePano[i]->Nom() == nom)
@@ -104,6 +104,11 @@ bool Chantier::AddResult(std::string fileResult)
         return XErrorError(m_error,__FUNCTION__,"Pano non trouve ",nom2.c_str());
     Appariement* app = new Appariement(pano1,pano2);
     m_listeAppariement.push_back(app);
+
+    std::string fichier = m_strNomDossier + "\\" + fileResult;
+    if(!app->ChargeMesures(m_error, fichier))
+        return XErrorError(m_error,__FUNCTION__,"Erreur dans le chargement des mesures",fileResult.c_str());
+
     return true;
 }
 //------------------------------------------------------------

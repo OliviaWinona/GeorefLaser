@@ -12,7 +12,7 @@
 
 Panoramique::~Panoramique(){;}
 //------------------------------------------------------------
-Chantier* Panoramique::Chantier(){return pChantier;}
+//Chantier* Panoramique::Chantier(){return pChantier;}
 //------------------------------------------------------------
 
 //------------------------------------------------------------

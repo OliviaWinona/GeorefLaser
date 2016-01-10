@@ -17,6 +17,7 @@ protected:
     std::string m_strNomDossier;
     std::vector<Panoramique*> m_listePano;
     std::vector<Appariement*> m_listeAppariement;
+    int m_nbPoints;
 
     //Outils
     XStringTools st;
@@ -39,6 +40,7 @@ public:
     // Attributs
     int NbPanoramiques() ;
     std::string Dossier(){return m_strNomDossier;}
+    int NbPoints() {return m_nbPoints;}
 
 };
 

@@ -38,7 +38,7 @@ public:
     //bool operator==(Panoramique & P2){return m_strNom == P2.Nom();}
 
     //Attributs
-    Chantier* Chantier();
+    Chantier* Chantier() {return pChantier;}
     std::string Nom() {return m_strNom;}
     long Hauteur() {return m_hauteur;}
     long Largeur() {return m_largeur;}

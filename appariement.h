@@ -2,7 +2,8 @@
 #define APPARIEMENT_H
 
 #include <iostream>
-#include<vector>
+#include <vector>
+#include "libXBase/XError.h"
 #include "panoramique.h"
 #include "point.h"
 
@@ -17,7 +18,7 @@ public:
     Appariement(Panoramique* pano1, Panoramique* pano2);
     ~Appariement();
 
-    bool ChargeMesures();
+    bool ChargeMesures(XError* error, std::string FileResult);
 
 };
 
