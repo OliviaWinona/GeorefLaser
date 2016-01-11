@@ -72,6 +72,8 @@ bool Chantier::ChargePano(std::string dossier)
 
     m_strNomDossier = dossier;
     XErrorInfo(m_error,__FUNCTION__,"NB images",st.itoa(m_listePano.size()).c_str());
+    if (m_listePano.size() < 2)
+        return XErrorError(m_error,__FUNCTION__,"Il n'y a pas assez d'images");
     return InitPanos();
 }
 //------------------------------------------------------------
@@ -106,7 +108,7 @@ bool Chantier::AddResult(std::string fileResult)
     m_listeAppariement.push_back(app);
 
     std::string fichier = m_strNomDossier + "\\" + fileResult;
-    if(!app->ChargeMesures(m_error, fichier))
+    if(!app->ChargeMesures(m_error, fichier, &m_nbPoints))
         return XErrorError(m_error,__FUNCTION__,"Erreur dans le chargement des mesures",fileResult.c_str());
 
     return true;

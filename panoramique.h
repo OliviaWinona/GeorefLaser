@@ -42,6 +42,7 @@ public:
     std::string Nom() {return m_strNom;}
     long Hauteur() {return m_hauteur;}
     long Largeur() {return m_largeur;}
+    std::vector<Point*> tousPointsIm() {return m_tousPointsIm;}
 
     //Méthodes
     bool Init(XError* error);

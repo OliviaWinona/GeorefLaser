@@ -10,15 +10,20 @@
 class Appariement
 {
 protected:
+    //Attributs
     Panoramique * image1;
     Panoramique * image2;
     std::vector<Point*> listePoints;
+
+    //Méthodes internes
+    Point* FindPoint(int num, Panoramique *pano);
 
 public:
     Appariement(Panoramique* pano1, Panoramique* pano2);
     ~Appariement();
 
-    bool ChargeMesures(XError* error, std::string FileResult);
+    //Méthodes
+    bool ChargeMesures(XError* error, std::string FileResult, int *nbPoints);
 
 };
 

@@ -1,5 +1,8 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
+#include <vector>
+#include <libXBase/XStringTools.h>
 #include "appariement.h"
 #include "point.h"
 #include "panoramique.h"
@@ -17,7 +20,18 @@ Appariement::~Appariement()
 {
 }
 //------------------------------------------------------------
-bool Appariement::ChargeMesures(XError* error, std::string FileResult)
+Point* Appariement::FindPoint(int numero, Panoramique* pano)
+{
+    for(int i=0 ; i<pano->tousPointsIm().size() ; i++)
+    {
+        if (pano->tousPointsIm()[i]->NumPoint() == numero)
+            return pano->tousPointsIm()[i];
+    }
+    return NULL;
+}
+
+//------------------------------------------------------------
+bool Appariement::ChargeMesures(XError* error, std::string FileResult, int* nbPoints)
 {
     std::string nomResult = image1->Nom() + ".-." + image2->Nom() + ".result";
     XErrorInfo(error,__FUNCTION__,"Chargement mesures", nomResult.c_str());
@@ -27,8 +41,16 @@ bool Appariement::ChargeMesures(XError* error, std::string FileResult)
         return XErrorError(error,__FUNCTION__,"Erreur ouverture fichier",FileResult.c_str());
 
     std::string ligneEnCours;
-    file >> ligneEnCours;
-    cout << ligneEnCours << endl;
+    XStringTools st;
+    std::vector<std::string>decoupage;
+    while(!file.eof())
+    {
+        getline(file, ligneEnCours);
+        st.Tokenize(ligneEnCours, decoupage, "\t");
+        //cout << decoupage[0] << endl;
+
+        decoupage.clear();
+    }
 
     file.close();
     return true;

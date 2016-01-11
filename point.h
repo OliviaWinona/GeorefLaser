@@ -5,14 +5,20 @@
 
 class Point
 {
+protected:
+    //Attribut
+    int m_num;
+    float m_ligne;
+    float m_colonne;
+    float m_z;
+
 public:
-    Point();
+    Point(int num, int l, int c);
     ~Point();
 
-    int num;
-    float ligne;
-    float colonne;
-    float z;
+    //Attributs
+    int NumPoint() {return m_num;}
+
 };
 
 #endif // POINT_H

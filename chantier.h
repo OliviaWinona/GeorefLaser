@@ -17,7 +17,7 @@ protected:
     std::string m_strNomDossier;
     std::vector<Panoramique*> m_listePano;
     std::vector<Appariement*> m_listeAppariement;
-    int m_nbPoints;
+    int m_nbPoints = 0;
 
     //Outils
     XStringTools st;
