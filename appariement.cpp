@@ -20,16 +20,15 @@ Appariement::~Appariement()
 {
 }
 //------------------------------------------------------------
-Point* Appariement::FindPoint(int numero, Panoramique* pano)
+int Appariement::FindPoint(float l, float c, Panoramique* pano)
 {
     for(int i=0 ; i<pano->tousPointsIm().size() ; i++)
     {
-        if (pano->tousPointsIm()[i]->NumPoint() == numero)
-            return pano->tousPointsIm()[i];
+        if (pano->tousPointsIm()[i]->ligne() == l && pano->tousPointsIm()[i]->colonne() == c)
+            return pano->tousPointsIm()[i]->numPoint();
     }
-    return NULL;
+    return 0;
 }
-
 //------------------------------------------------------------
 bool Appariement::ChargeMesures(XError* error, std::string FileResult, int* nbPoints)
 {
@@ -43,11 +42,43 @@ bool Appariement::ChargeMesures(XError* error, std::string FileResult, int* nbPo
     std::string ligneEnCours;
     XStringTools st;
     std::vector<std::string>decoupage;
+    float x1, y1, x2, y2;
     while(!file.eof())
     {
         getline(file, ligneEnCours);
         st.Tokenize(ligneEnCours, decoupage, "\t");
-        //cout << decoupage[0] << endl;
+        x1 = atof(decoupage[0].c_str());
+        y1 = atof(decoupage[1].c_str());
+        x2 = atof(decoupage[2].c_str());
+        y2 = atof(decoupage[3].c_str());
+        int num1 = FindPoint(x1, y1, image1);
+        int num2 = FindPoint(x2, y2, image2);
+
+        if(num1 == 0 && num2 == 0) //point non existant
+        {
+            (*nbPoints) = (*nbPoints) + 1;
+            Point* pt1 = new Point((int)nbPoints, x1, y1);
+            Point* pt2 = new Point((int)nbPoints, x2, y2);
+            listePoints.push_back(pt1);
+            listePoints.push_back(pt2);
+
+            image1->tousPointsIm().push_back(pt1);
+            image2->tousPointsIm().push_back(pt2);
+        }
+
+        if(num1 != 0) //point déjà existant sur la pano 1
+        {
+            Point* pt2 = new Point(num1, x2, y2);
+            listePoints.push_back(pt2);
+            image2->tousPointsIm().push_back(pt2);
+        }
+
+        if(num2 != 0) //point déjà existant sur la pano 2
+        {
+            Point* pt1 = new Point(num2, x1, y1);
+            listePoints.push_back(pt1);
+            image1->tousPointsIm().push_back(pt1);
+        }
 
         decoupage.clear();
     }

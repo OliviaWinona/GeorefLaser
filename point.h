@@ -13,11 +13,13 @@ protected:
     float m_z;
 
 public:
-    Point(int num, int l, int c);
+    Point(int num, float l, float c);
     ~Point();
 
     //Attributs
-    int NumPoint() {return m_num;}
+    int numPoint() {return m_num;}
+    float ligne() {return m_ligne;}
+    float colonne() {return m_colonne;}
 
 };
 

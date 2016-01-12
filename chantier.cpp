@@ -110,7 +110,7 @@ bool Chantier::AddResult(std::string fileResult)
     std::string fichier = m_strNomDossier + "\\" + fileResult;
     if(!app->ChargeMesures(m_error, fichier, &m_nbPoints))
         return XErrorError(m_error,__FUNCTION__,"Erreur dans le chargement des mesures",fileResult.c_str());
-
+    cout << m_nbPoints << endl;
     return true;
 }
 //------------------------------------------------------------

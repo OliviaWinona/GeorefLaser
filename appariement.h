@@ -16,7 +16,7 @@ protected:
     std::vector<Point*> listePoints;
 
     //Méthodes internes
-    Point* FindPoint(int num, Panoramique *pano);
+    int FindPoint(float l, float c, Panoramique *pano);
 
 public:
     Appariement(Panoramique* pano1, Panoramique* pano2);

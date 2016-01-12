@@ -1,6 +1,6 @@
 #include "point.h"
 
-Point::Point(int num, int l, int c)
+Point::Point(int num, float l, float c)
 {
     m_num = num;
     m_ligne = l;
