@@ -36,9 +36,10 @@ public:
     // Méthodes
     bool ChargePano(std::string dossier);
     bool ChargeResult(std::string dossier);
+    int NbPanoramiques();
+    bool Compensation();
 
     // Attributs
-    int NbPanoramiques() ;
     std::string Dossier(){return m_strNomDossier;}
     int NbPoints() {return m_nbPoints;}
 

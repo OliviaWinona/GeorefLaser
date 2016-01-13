@@ -66,8 +66,5 @@ bool Panoramique::Init(XError* error)
     if(!calculLargHaut())
         return XErrorError(error,__FUNCTION__,"Erreur de calcul des dimensions ",m_strNom.c_str());
 
-    if(!ChargeCarteProfondeur())
-        return XErrorError(error,__FUNCTION__,"Erreur de chargement de la carte de profondeur",m_strNom.c_str());
-
     return true;
 }

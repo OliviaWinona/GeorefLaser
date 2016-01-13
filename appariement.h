@@ -11,12 +11,15 @@ class Appariement
 {
 protected:
     //Attributs
-    Panoramique * image1;
-    Panoramique * image2;
-    std::vector<Point*> listePoints;
+    Panoramique * m_image1;
+    Panoramique * m_image2;
+    std::vector<Point*> m_listePoints;
 
     //Méthodes internes
     int FindPoint(float l, float c, Panoramique *pano);
+    bool AjoutPoint(int num, float l, float c, Panoramique* pano);
+    bool PointCoherent(float l, float c, Panoramique *pano);
+    bool Nettoyage(Panoramique* pano1, Panoramique *pano2);
 
 public:
     Appariement(Panoramique* pano1, Panoramique* pano2);
@@ -24,6 +27,7 @@ public:
 
     //Méthodes
     bool ChargeMesures(XError* error, std::string FileResult, int *nbPoints);
+    int NbPointsApp();
 
 };
 

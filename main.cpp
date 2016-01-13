@@ -64,6 +64,11 @@ int main(int argc, char **argv)
         getchar();
         return 0;
     }
+    if(!projet->Compensation())
+    {
+        getchar();
+        return 0;
+    }
 
     XErrorCommentaire(m_error,__FUNCTION__, "FIN");
     return 0;

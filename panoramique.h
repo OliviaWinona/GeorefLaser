@@ -28,7 +28,6 @@ protected:
 
     //Méthode
     bool calculLargHaut();
-    bool ChargeCarteProfondeur();
 
 public:
     Panoramique(Chantier* parent,std::string nom){pChantier = parent;m_strNom = nom;}
@@ -43,9 +42,11 @@ public:
     long Hauteur() {return m_hauteur;}
     long Largeur() {return m_largeur;}
     std::vector<Point*> tousPointsIm() {return m_tousPointsIm;}
+    std::vector<float> CarteProfondeur() {return m_carteProfondeur;}
 
     //Méthodes
     bool Init(XError* error);
+    bool ChargeCarteProfondeur();
 };
 
 #endif // PANORAMIQUE_H

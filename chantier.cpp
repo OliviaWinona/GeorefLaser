@@ -47,8 +47,7 @@ bool Chantier::ChargePano(std::string dossier)
         }
         closedir(rep);
     }
-    //XSystemInfo system;
-    //system.GetFileListInFolder(dossier, contenuDossier, "*.*", true);
+
     char message[1024];
     sprintf(message,"%d fichiers",contenuDossier.size());
     XErrorInfo(m_error, __FUNCTION__,message,dossier.c_str());
@@ -110,7 +109,7 @@ bool Chantier::AddResult(std::string fileResult)
     std::string fichier = m_strNomDossier + "\\" + fileResult;
     if(!app->ChargeMesures(m_error, fichier, &m_nbPoints))
         return XErrorError(m_error,__FUNCTION__,"Erreur dans le chargement des mesures",fileResult.c_str());
-    cout << m_nbPoints << endl;
+
     return true;
 }
 //------------------------------------------------------------
@@ -135,5 +134,12 @@ bool Chantier::ChargeResult(std::string dossier)
     if (m_listeAppariement.size() == 0)
         return XErrorError(m_error,__FUNCTION__,"pas de result valide dans ce dossier ",dossier.c_str());
 
+    cout << m_nbPoints << endl;
+    return true;
+}
+//------------------------------------------------------------
+//------------------------------------------------------------
+bool Chantier::Compensation()
+{
     return true;
 }
