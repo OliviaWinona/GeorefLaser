@@ -4,7 +4,6 @@
 #include <vector>
 #include <stdio.h>
 #include <dirent.h>
-#include <stdlib.h>
 
 #include "libXFileSystem/XSystemInfo.h"
 #include "libXFileSystem/XPath.h"

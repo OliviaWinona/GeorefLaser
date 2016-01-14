@@ -2,6 +2,8 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <stdlib.h>
+#include <time.h>
 #include <libXBase/XStringTools.h>
 #include "appariement.h"
 #include "point.h"
@@ -150,10 +152,11 @@ bool Appariement::DejaPresent(std::vector<Point*> lstPts, Point* pt)
 std::vector<Point*> Appariement::ChoixQuatrePointsAleatoires(std::vector<Point*> points)
 {
     int rd;
-    while(points.size() != 4)
+    srand(time(NULL));
+    while(points.size() < 4)
     {
-        rd = rand() % NbPointsApp();
-        cout << "rand" << rd << endl;
+        rd = rand() % NbPointsApp() + 1;
+        cout << "rand " << rd << endl;
         if(DejaPresent(points, m_listePoints[rd]))
             continue;
 
