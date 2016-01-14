@@ -4,11 +4,13 @@
 #include <vector>
 #include <stdio.h>
 #include <dirent.h>
+#include <stdlib.h>
 
 #include "libXFileSystem/XSystemInfo.h"
 #include "libXFileSystem/XPath.h"
 
 #include "panoramique.h"
+#include "appariement.h"
 
 using namespace std;
 
@@ -104,12 +106,13 @@ bool Chantier::AddResult(std::string fileResult)
     if(pano2 == NULL)
         return XErrorError(m_error,__FUNCTION__,"Pano non trouve ",nom2.c_str());
     Appariement* app = new Appariement(pano1,pano2);
+
+    if(!app->ChargeMesures(m_error, fileResult, &m_nbPoints))
+    {
+        delete app;
+        return true;
+    }
     m_listeAppariement.push_back(app);
-
-    std::string fichier = m_strNomDossier + "\\" + fileResult;
-    if(!app->ChargeMesures(m_error, fichier, &m_nbPoints))
-        return XErrorError(m_error,__FUNCTION__,"Erreur dans le chargement des mesures",fileResult.c_str());
-
     return true;
 }
 //------------------------------------------------------------
@@ -134,12 +137,29 @@ bool Chantier::ChargeResult(std::string dossier)
     if (m_listeAppariement.size() == 0)
         return XErrorError(m_error,__FUNCTION__,"pas de result valide dans ce dossier ",dossier.c_str());
 
-    cout << m_nbPoints << endl;
     return true;
 }
 //------------------------------------------------------------
 //------------------------------------------------------------
-bool Chantier::Compensation()
+Appariement* Chantier::PlusPointsCommum()
 {
+    Appariement* app = m_listeAppariement[0];
+    for(int i=0 ; i<m_listeAppariement.size() ; i++)
+    {
+        if(m_listeAppariement[i]->NbPointsApp() > app->NbPointsApp())
+            app = m_listeAppariement[i];
+    }
+    return app;
+}
+//------------------------------------------------------------
+bool Chantier::Orientation()
+{
+    XErrorInfo(m_error,__FUNCTION__,"Nb d'appariements : ",st.itoa(m_listeAppariement.size()).c_str());
+    Appariement* app = PlusPointsCommum();
+
+    std::vector<Point*> pointsAleatoires;
+    pointsAleatoires = app->ChoixQuatrePointsAleatoires(pointsAleatoires);
+    cout << pointsAleatoires.size() << endl;
+
     return true;
 }

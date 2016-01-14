@@ -68,3 +68,21 @@ bool Panoramique::Init(XError* error)
 
     return true;
 }
+//------------------------------------------------------------
+bool Panoramique::GetZ(float l, float c, float* z)
+{
+    if(m_carteProfondeur[c+l*m_largeur] == 0)
+        return false;
+    (*z) = m_carteProfondeur[c+l*m_largeur];
+    return true;
+}
+//------------------------------------------------------------
+int Panoramique::FindPoint(float l, float c)
+{
+    for(int i=0 ; i<m_tousPointsIm.size() ; i++)
+    {
+        if (m_tousPointsIm[i]->Ligne() == l && m_tousPointsIm[i]->Colonne() == c)
+            return m_tousPointsIm[i]->NumPoint();
+    }
+    return 0;
+}

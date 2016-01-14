@@ -27,22 +27,21 @@ protected:
     bool InitPanos();
     bool AddResult(std::string fileResult);
     Panoramique* FindPano(std::string nom);
-
+    Appariement* PlusPointsCommum();
 
 public:
     Chantier(XError* error);
     ~Chantier();
 
-    // Méthodes
-    bool ChargePano(std::string dossier);
-    bool ChargeResult(std::string dossier);
-    int NbPanoramiques();
-    bool Compensation();
-
     // Attributs
     std::string Dossier(){return m_strNomDossier;}
     int NbPoints() {return m_nbPoints;}
 
+    // Méthodes
+    bool ChargePano(std::string dossier);
+    bool ChargeResult(std::string dossier);
+    int NbPanoramiques();
+    bool Orientation();
 };
 
 #endif // CHANTIER_H

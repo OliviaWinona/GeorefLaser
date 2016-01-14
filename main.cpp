@@ -64,7 +64,7 @@ int main(int argc, char **argv)
         getchar();
         return 0;
     }
-    if(!projet->Compensation())
+    if(!projet->Orientation())
     {
         getchar();
         return 0;

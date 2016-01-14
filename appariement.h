@@ -14,12 +14,12 @@ protected:
     Panoramique * m_image1;
     Panoramique * m_image2;
     std::vector<Point*> m_listePoints;
+    bool m_traite = false;
 
     //Méthodes internes
-    int FindPoint(float l, float c, Panoramique *pano);
-    bool AjoutPoint(int num, float l, float c, Panoramique* pano);
-    bool PointCoherent(float l, float c, Panoramique *pano);
     bool Nettoyage(Panoramique* pano1, Panoramique *pano2);
+    bool AjoutPoint(int num, float l, float c, float z, Panoramique* pano);
+    bool DejaPresent(std::vector<Point*> lstPts, Point* pt);
 
 public:
     Appariement(Panoramique* pano1, Panoramique* pano2);
@@ -28,6 +28,7 @@ public:
     //Méthodes
     bool ChargeMesures(XError* error, std::string FileResult, int *nbPoints);
     int NbPointsApp();
+    std::vector<Point *> ChoixQuatrePointsAleatoires(std::vector<Point*> points);
 
 };
 

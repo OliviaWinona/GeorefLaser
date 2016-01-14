@@ -33,9 +33,6 @@ public:
     Panoramique(Chantier* parent,std::string nom){pChantier = parent;m_strNom = nom;}
     ~Panoramique();
 
-    // Surcharge
-    //bool operator==(Panoramique & P2){return m_strNom == P2.Nom();}
-
     //Attributs
     Chantier* Chantier() {return pChantier;}
     std::string Nom() {return m_strNom;}
@@ -47,6 +44,8 @@ public:
     //Méthodes
     bool Init(XError* error);
     bool ChargeCarteProfondeur();
+    bool GetZ(float l, float c, float* z);
+    int FindPoint(float l, float c);
 };
 
 #endif // PANORAMIQUE_H
