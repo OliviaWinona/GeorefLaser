@@ -18,9 +18,9 @@ public:
 
     //Attributs
     int NumPoint() {return m_num;}
-    float Ligne() {return m_ligne;}
-    float Colonne() {return m_colonne;}
-    float Profondeur() {return m_z;}
+    float Ligne() {return m_ligne;} //y
+    float Colonne() {return m_colonne;} //x
+    float Profondeur() {return m_z;} // z
 
 };
 

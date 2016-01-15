@@ -4,7 +4,10 @@
 #include <vector>
 #include <stdlib.h>
 #include <time.h>
-#include <libXBase/XStringTools.h>
+#include <Eigen/Dense>
+
+#include "libXBase/XStringTools.h"
+#include "libXBase/XPt3D.h"
 #include "appariement.h"
 #include "point.h"
 #include "panoramique.h"
@@ -96,8 +99,8 @@ bool Appariement::ChargeMesures(XError* error, std::string FileResult, int* nbPo
             if(!m_image2->GetZ(l2,c2,&z2))
                 continue;
 
-            int num1 = m_image1->FindPoint(l1, c1);
-            int num2 = m_image2->FindPoint(l2, c2);
+            int num1 = m_image1->GetNum(l1, c1);
+            int num2 = m_image2->GetNum(l2, c2);
 
             if(num1 != 0) //point déjà existant sur la pano 1
             {
@@ -141,7 +144,7 @@ bool Appariement::ChargeMesures(XError* error, std::string FileResult, int* nbPo
 //------------------------------------------------------------
 bool Appariement::DejaPresent(std::vector<Point*> lstPts, Point* pt)
 {
-    for(int i=0 ; i<lstPts.size() ; i++)
+    for(unsigned int i=0 ; i<lstPts.size() ; i++)
     {
         if(lstPts[i]->NumPoint() == pt->NumPoint())
             return true;
@@ -156,7 +159,7 @@ std::vector<Point*> Appariement::ChoixQuatrePointsAleatoires(std::vector<Point*>
     while(points.size() < 4)
     {
         rd = rand() % NbPointsApp() + 1;
-        cout << "rand " << rd << endl;
+        //cout << "pt " << m_listePoints[rd]->NumPoint() << " & rand " << rd << endl;
         if(DejaPresent(points, m_listePoints[rd]))
             continue;
 
@@ -165,3 +168,89 @@ std::vector<Point*> Appariement::ChoixQuatrePointsAleatoires(std::vector<Point*>
 
     return points;
 }
+//------------------------------------------------------------
+bool Appariement::Thomson_Shut(XError* error, std::vector<XPt3D> &ptPano1,std::vector<XPt3D> &ptPano2, Eigen::Matrix3d *R, Eigen::Vector3d *T, double *e)
+{
+    if(ptPano1.size() != ptPano2.size())
+        return XErrorError(error,__FUNCTION__,"pas le meme nb de pt entre les 2 stations pour la similitude");
+    if(ptPano1.size() <=3)
+        return XErrorError(error,__FUNCTION__,"pas assez de points");
+
+
+    //Passage en coordonnées barycentrique
+    XPt3D G1 = XPt3D(0,0,0);
+    XPt3D G2 = XPt3D(0,0,0);
+
+    //Moyenne des coordonnées des points des 4 points de la première station
+    for(auto &s : ptPano1)
+        G1 += s;
+    G1 /= ptPano1.size();
+    //Moyenne des coordonnées des points des 4 points de la deuxième station
+    for(auto &s : ptPano2)
+        G2 += s;
+    G2 /= ptPano2.size();
+
+    cout << G1.X << " " << G1.Y << " " << G1.Z << endl;
+
+    double r1 = 0;
+    double r2 = 0;
+
+    for(auto &s : ptPano1)
+        r1 += std::pow((s.X-G2.X),2) + std::pow((s.Y-G2.Y),2) + std::pow((s.Z-G2.Z),2);
+    for(auto &s : ptPano2)
+        r2 += std::pow((s.X-G1.X),2) + std::pow((s.Y-G1.Y),2) + std::pow((s.Z-G1.Z),2);
+
+    (*e) = sqrt(r1/r2);
+
+}
+
+//     Coord X1;
+//     Coord X2;
+//     //least squares for rotation only
+//     Eigen::MatrixXd A(Xm.size()*3,3);
+//     Eigen::VectorXd B(Xm.size()*3);
+//     for (unsigned long i=0;i<Xt.size();i++)
+//     {
+//         X1=Xm[i]-Gm;
+//         X1*=(*scale);
+//         X2=Xt[i]-Gt;
+
+//         A(i*3+0,0)=0;
+//         A(i*3+0,1)=-(X1.z()+X2.z());
+//         A(i*3+0,2)=X1.y()+X2.y();
+//         B(i*3+0)=  X1.x()-X2.x();
+
+//         A(i*3+1,0)=X1.z()+X2.z();
+//         A(i*3+1,1)=0;
+//         A(i*3+1,2)= -(X1.x()+X2.x());
+//         B(i*3+1)=  X1.y()-X2.y();
+
+//         A(i*3+2,0)=-(X1.y()+X2.y());
+//         A(i*3+2,1)=X1.x()+X2.x();
+//         A(i*3+2,2)=0;
+//         B(i*3+2)=  X1.z()-X2.z();
+//     }
+//     Eigen::MatrixXd AtA=(A.transpose())*A;
+//     Eigen::MatrixXd AtB=(A.transpose())*B;
+//     Eigen::Vector3d solution = AtA.colPivHouseholderQr().solve(AtB);
+
+//     tdouble N=solution.norm();
+
+//     if (N<1e-30)
+//     {
+//         solution(0)=0;
+//         solution(1)=0;
+//         solution(2)=1;
+//         N=0;
+//     }else
+//         solution=solution/N;
+
+//     N=2*atan(N);
+//     abc2R(solution[0],solution[1],solution[2],N,R);
+
+//     Eigen::Vector3d vect_Gm,vect_Gt;
+//     vect_Gm<<Gm.x(),Gm.y(),Gm.z();
+//     vect_Gt<<Gt.x(),Gt.y(),Gt.z();
+//     (*T)=(*R)*vect_Gm;//translation
+//     (*T)=(*T)*(*scale);
+//     (*T)=vect_Gt-(*T);

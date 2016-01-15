@@ -9,6 +9,7 @@
 
 #include "point.h"
 #include "libXBase/Xerror.h"
+#include "libXBase/XPt3D.h"
 
 class Appariement;
 class Chantier;
@@ -22,8 +23,9 @@ protected:
     long m_hauteur;
     std::vector<Appariement*> m_apparie;
     std::vector<Point*> m_tousPointsIm;
-    Eigen::Matrix3f m_rotation;
-    Eigen::Vector3f m_translation;
+    Eigen::Matrix3d m_rotation;
+    Eigen::Vector3d m_translation;
+    double m_echelle;
     std::vector<float> m_carteProfondeur;
 
     //Méthode
@@ -38,14 +40,18 @@ public:
     std::string Nom() {return m_strNom;}
     long Hauteur() {return m_hauteur;}
     long Largeur() {return m_largeur;}
-    std::vector<Point*> tousPointsIm() {return m_tousPointsIm;}
-    std::vector<float> CarteProfondeur() {return m_carteProfondeur;}
+    std::vector<Point*> & tousPointsIm() {return m_tousPointsIm;}
+    std::vector<float> & CarteProfondeur() {return m_carteProfondeur;}
+    Eigen::Matrix3d* Rotation() {return &m_rotation;}
+    Eigen::Vector3d* Translation() {return &m_translation;}
+    double* Echelle() {return &m_echelle;}
 
     //Méthodes
     bool Init(XError* error);
     bool ChargeCarteProfondeur();
     bool GetZ(float l, float c, float* z);
-    int FindPoint(float l, float c);
+    int GetNum(float l, float c);
+    XPt3D GetPoint(int num);
 };
 
 #endif // PANORAMIQUE_H

@@ -5,7 +5,8 @@
 #include <cmath>
 #include <Eigen/Dense>
 #include <string>
-#include <libXBase/XStringTools.h>
+#include "libXBase/XStringTools.h"
+#include "libXBase/XPt3D.h"
 #include "appariement.h"
 #include "chantier.h"
 
@@ -59,6 +60,7 @@ bool Panoramique::ChargeCarteProfondeur()
     m_carteProfondeur.resize(m_largeur * m_hauteur,0);
     file.read((char*)&m_carteProfondeur[0], sizeof(float)*m_largeur*m_hauteur);
     file.close();
+    return true;
 }
 //------------------------------------------------------------
 bool Panoramique::Init(XError* error)
@@ -77,12 +79,26 @@ bool Panoramique::GetZ(float l, float c, float* z)
     return true;
 }
 //------------------------------------------------------------
-int Panoramique::FindPoint(float l, float c)
+int Panoramique::GetNum(float l, float c)
 {
-    for(int i=0 ; i<m_tousPointsIm.size() ; i++)
+    for(unsigned int i=0 ; i<m_tousPointsIm.size() ; i++)
     {
         if (m_tousPointsIm[i]->Ligne() == l && m_tousPointsIm[i]->Colonne() == c)
             return m_tousPointsIm[i]->NumPoint();
     }
     return 0;
+}
+//------------------------------------------------------------
+XPt3D Panoramique::GetPoint(int num)
+{
+    //std::cout << "taille " << m_tousPointsIm.size() << std::endl;
+    //std::cout << "num debut fonction" << num << std::endl;
+    for(unsigned int i=0 ; i<m_tousPointsIm.size() ; i++)
+    {
+        //std::cout << "num " << m_tousPointsIm[i]->NumPoint() << std::endl;
+        if (m_tousPointsIm[i]->NumPoint() == num)
+            //std::cout << "x " << m_tousPointsIm[i]->Colonne() << std::endl;
+            return XPt3D((double)m_tousPointsIm[i]->Colonne(), (double)m_tousPointsIm[i]->Ligne(), (double)m_tousPointsIm[i]->Profondeur());
+    }
+    return NULL;
 }

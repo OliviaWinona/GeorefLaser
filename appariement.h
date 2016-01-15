@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include "libXBase/XError.h"
+#include "libXBase/XPt3D.h"
 #include "panoramique.h"
 #include "point.h"
 
@@ -25,10 +26,14 @@ public:
     Appariement(Panoramique* pano1, Panoramique* pano2);
     ~Appariement();
 
+    Panoramique* Pano1() {return m_image1;}
+    Panoramique* Pano2() {return m_image2;}
+
     //Méthodes
     bool ChargeMesures(XError* error, std::string FileResult, int *nbPoints);
     int NbPointsApp();
     std::vector<Point *> ChoixQuatrePointsAleatoires(std::vector<Point*> points);
+    bool Thomson_Shut(XError *error, std::vector<XPt3D> &ptPano1, std::vector<XPt3D> &ptPano2, Eigen::Matrix3d *R, Eigen::Vector3d *T, double *e);
 
 };
 

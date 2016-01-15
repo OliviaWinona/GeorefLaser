@@ -7,6 +7,7 @@
 
 #include "libXFileSystem/XSystemInfo.h"
 #include "libXFileSystem/XPath.h"
+#include "libXBase/XPt3D.h"
 
 #include "panoramique.h"
 #include "appariement.h"
@@ -27,7 +28,7 @@ int Chantier::NbPanoramiques() {return m_listePano.size();}
 bool Chantier::InitPanos()
 {
     bool ok;
-    for(uint32 i=0; i< NbPanoramiques(); i++)
+    for(int i=0; i< NbPanoramiques(); i++)
     {
         ok = m_listePano[i]->Init(m_error);
     }
@@ -53,7 +54,7 @@ bool Chantier::ChargePano(std::string dossier)
     sprintf(message,"%d fichiers",contenuDossier.size());
     XErrorInfo(m_error, __FUNCTION__,message,dossier.c_str());
 
-    for (int i=0; i < contenuDossier.size(); i++){
+    for (unsigned int i=0; i < contenuDossier.size(); i++){
         if(P.Extension(contenuDossier[i].c_str()) == "tif"){
             std::string nomPano = P.NameNoExt(contenuDossier[i].c_str());
             std::string nomCarteProfondeur = nomPano+".bin";
@@ -80,7 +81,7 @@ bool Chantier::ChargePano(std::string dossier)
 //------------------------------------------------------------
 Panoramique* Chantier::FindPano(std::string nom)
 {
-    for (int i=0 ; i<m_listePano.size() ; i++)
+    for (unsigned int i=0 ; i<m_listePano.size() ; i++)
     {
         if (m_listePano[i]->Nom() == nom)
             return m_listePano[i];
@@ -129,7 +130,7 @@ bool Chantier::ChargeResult(std::string dossier)
         closedir(rep);
     }
 
-    for (int i=0; i < contenuDossier.size(); i++)
+    for (unsigned int i=0; i < contenuDossier.size(); i++)
         if(P.Extension(contenuDossier[i].c_str()) == "result")
             AddResult(contenuDossier[i]);
 
@@ -143,7 +144,7 @@ bool Chantier::ChargeResult(std::string dossier)
 Appariement* Chantier::PlusPointsCommum()
 {
     Appariement* app = m_listeAppariement[0];
-    for(int i=0 ; i<m_listeAppariement.size() ; i++)
+    for(unsigned int i=0 ; i<m_listeAppariement.size() ; i++)
     {
         if(m_listeAppariement[i]->NbPointsApp() > app->NbPointsApp())
             app = m_listeAppariement[i];
@@ -158,7 +159,12 @@ bool Chantier::Orientation()
 
     std::vector<Point*> pointsAleatoires;
     pointsAleatoires = app->ChoixQuatrePointsAleatoires(pointsAleatoires);
-    cout << pointsAleatoires.size() << endl;
-
+    std::vector<XPt3D> pointsPano1, pointsPano2;
+    for(unsigned int i=0 ; i<pointsAleatoires.size() ; i++)
+    {
+        pointsPano1.push_back(app->Pano1()->GetPoint(pointsAleatoires[i]->NumPoint()));
+        pointsPano2.push_back(app->Pano2()->GetPoint(pointsAleatoires[i]->NumPoint()));
+    }
+    app->Thomson_Shut(m_error,pointsPano1,pointsPano2,app->Pano1()->Rotation(),app->Pano1()->Translation(),app->Pano1()->Echelle());
     return true;
 }
