@@ -21,6 +21,7 @@ protected:
     bool Nettoyage(Panoramique* pano1, Panoramique *pano2);
     bool AjoutPoint(int num, float l, float c, float z, Panoramique* pano);
     bool DejaPresent(std::vector<Point*> lstPts, Point* pt);
+    void CalculCoefAxiateur(double a,double b,double c,double theta,Eigen::Matrix3d *R);
 
 public:
     Appariement(Panoramique* pano1, Panoramique* pano2);

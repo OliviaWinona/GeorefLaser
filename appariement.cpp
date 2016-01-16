@@ -169,6 +169,26 @@ std::vector<Point*> Appariement::ChoixQuatrePointsAleatoires(std::vector<Point*>
     return points;
 }
 //------------------------------------------------------------
+void Appariement::CalculCoefAxiateur(double a, double b, double c, double theta, Eigen::Matrix3d *R)
+{
+     double cost1 = 1 - cos(theta);
+     double sint = sin(theta);
+     double d = sqrt(a*a + b*b + c*c);
+     double u = a/d;
+     double v = b/d;
+     double w = c/d;
+     (*R)(0,0)= 1 -(1 - u*u) * cost1;
+     (*R)(0,1)= -w*sint + u*v*cost1;
+     (*R)(0,2)= v*sint + u*w*cost1;
+     (*R)(1,0)= w*sint + u*v*cost1;
+     (*R)(1,1)= 1 -(1 - v*v) * cost1;
+     (*R)(1,2)= -u*sint + v*w*cost1;
+     (*R)(2,0)= -v*sint + u*w*cost1;
+     (*R)(2,1)= u*sint + v*w*cost1;
+     (*R)(2,2)= 1 -(1 - w*w) * cost1;
+}
+
+//------------------------------------------------------------
 bool Appariement::Thomson_Shut(XError* error, std::vector<XPt3D> &ptPano1,std::vector<XPt3D> &ptPano2, Eigen::Matrix3d *R, Eigen::Vector3d *T, double *e)
 {
     if(ptPano1.size() != ptPano2.size())
@@ -176,81 +196,84 @@ bool Appariement::Thomson_Shut(XError* error, std::vector<XPt3D> &ptPano1,std::v
     if(ptPano1.size() <=3)
         return XErrorError(error,__FUNCTION__,"pas assez de points");
 
-
-    //Passage en coordonnées barycentrique
+    // Passage en coordonnées barycentrique
     XPt3D G1 = XPt3D(0,0,0);
     XPt3D G2 = XPt3D(0,0,0);
 
-    //Moyenne des coordonnées des points des 4 points de la première station
+    // Moyenne des coordonnées des points des 4 points de la première station
     for(auto &s : ptPano1)
         G1 += s;
     G1 /= ptPano1.size();
-    //Moyenne des coordonnées des points des 4 points de la deuxième station
+    // Moyenne des coordonnées des points des 4 points de la deuxième station
     for(auto &s : ptPano2)
         G2 += s;
     G2 /= ptPano2.size();
 
-    cout << G1.X << " " << G1.Y << " " << G1.Z << endl;
-
-    double r1 = 0;
-    double r2 = 0;
+    double dist1 = 0;
+    double dist2 = 0;
 
     for(auto &s : ptPano1)
-        r1 += std::pow((s.X-G2.X),2) + std::pow((s.Y-G2.Y),2) + std::pow((s.Z-G2.Z),2);
+        dist1 += std::pow((s.X-G2.X),2) + std::pow((s.Y-G2.Y),2) + std::pow((s.Z-G2.Z),2);
     for(auto &s : ptPano2)
-        r2 += std::pow((s.X-G1.X),2) + std::pow((s.Y-G1.Y),2) + std::pow((s.Z-G1.Z),2);
+        dist2 += std::pow((s.X-G1.X),2) + std::pow((s.Y-G1.Y),2) + std::pow((s.Z-G1.Z),2);
 
-    (*e) = sqrt(r1/r2);
+    (*e) = sqrt(dist1/dist2);
 
+    XPt3D X1,X2;
+    Eigen::MatrixXd A(ptPano1.size()*3,3);
+    Eigen::VectorXd B(ptPano1.size()*3);
+
+    for(unsigned int i=0 ; i<ptPano2.size() ; i++)
+    {
+        // On enlève le facteur d'échelle pour ramener la pano2 à la même échelle que la pano1
+        // On retire le barycentre au point
+        X1 = ptPano1[i] - G1;
+        X1 *= (*e);
+        X2 = ptPano2[i] - G2;
+
+        // Remplissage de la matrice et du vecteur pour le calcul de la transformation
+        // Première colonne
+        A(i*3,0) = 0;
+        A(i*3,1) = -(X1.Z + X2.Z);
+        A(i*3,2) = X1.Y + X2.Y;
+        B(i*3) = X1.X - X2.X;
+
+        // Deuxième colonne
+        A(i*3+1,0) = X1.Z + X2.Z;
+        A(i*3+1,1) = 0;
+        A(i*3+1,2) = -(X1.X + X2.X);
+        B(i*3+1) = X1.Y - X2.Y;
+
+        // Troisième colonne
+        A(i*3+2,0) = -(X1.Y + X2.Y);
+        A(i*3+2,1) = X1.X + X2.X;
+        A(i*3+2,2) = 0;
+        B(i*3+2) = X1.Z - X2.Z;
+    }
+
+    // Calcul de la matrice de rotation
+    Eigen::MatrixXd AtA = (A.transpose())*A;
+    Eigen::MatrixXd AtB = (A.transpose())*B;
+    Eigen::Vector3d soluc = AtA.colPivHouseholderQr().solve(AtB);
+
+    double N = soluc.norm();
+
+    if(N<1e-30)
+    {
+        soluc(0) = 0;
+        soluc(1) = 0;
+        soluc(2) = 1;
+        N = 0;
+    }else
+        soluc = soluc / N;
+
+    N = 2 * atan(N);
+    CalculCoefAxiateur(soluc[0],soluc[1],soluc[2],N,R);
+
+    Eigen::Vector3d vectG1, vectG2;
+    vectG1<<G1.X,G1.Y,G1.Z;
+    vectG2<<G2.X,G2.Y,G2.Z;
+
+    // Calcul de la translation
+    (*T) = vectG2 - (*R)*vectG1*(*e);
 }
-
-//     Coord X1;
-//     Coord X2;
-//     //least squares for rotation only
-//     Eigen::MatrixXd A(Xm.size()*3,3);
-//     Eigen::VectorXd B(Xm.size()*3);
-//     for (unsigned long i=0;i<Xt.size();i++)
-//     {
-//         X1=Xm[i]-Gm;
-//         X1*=(*scale);
-//         X2=Xt[i]-Gt;
-
-//         A(i*3+0,0)=0;
-//         A(i*3+0,1)=-(X1.z()+X2.z());
-//         A(i*3+0,2)=X1.y()+X2.y();
-//         B(i*3+0)=  X1.x()-X2.x();
-
-//         A(i*3+1,0)=X1.z()+X2.z();
-//         A(i*3+1,1)=0;
-//         A(i*3+1,2)= -(X1.x()+X2.x());
-//         B(i*3+1)=  X1.y()-X2.y();
-
-//         A(i*3+2,0)=-(X1.y()+X2.y());
-//         A(i*3+2,1)=X1.x()+X2.x();
-//         A(i*3+2,2)=0;
-//         B(i*3+2)=  X1.z()-X2.z();
-//     }
-//     Eigen::MatrixXd AtA=(A.transpose())*A;
-//     Eigen::MatrixXd AtB=(A.transpose())*B;
-//     Eigen::Vector3d solution = AtA.colPivHouseholderQr().solve(AtB);
-
-//     tdouble N=solution.norm();
-
-//     if (N<1e-30)
-//     {
-//         solution(0)=0;
-//         solution(1)=0;
-//         solution(2)=1;
-//         N=0;
-//     }else
-//         solution=solution/N;
-
-//     N=2*atan(N);
-//     abc2R(solution[0],solution[1],solution[2],N,R);
-
-//     Eigen::Vector3d vect_Gm,vect_Gt;
-//     vect_Gm<<Gm.x(),Gm.y(),Gm.z();
-//     vect_Gt<<Gt.x(),Gt.y(),Gt.z();
-//     (*T)=(*R)*vect_Gm;//translation
-//     (*T)=(*T)*(*scale);
-//     (*T)=vect_Gt-(*T);
