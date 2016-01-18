@@ -28,6 +28,7 @@ protected:
     bool AddResult(std::string fileResult);
     Panoramique* FindPano(std::string nom);
     Appariement* PlusPointsCommum();
+    bool Fini();
 
 public:
     Chantier(XError* error);

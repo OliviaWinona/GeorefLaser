@@ -276,4 +276,6 @@ bool Appariement::Thomson_Shut(XError* error, std::vector<XPt3D> &ptPano1,std::v
 
     // Calcul de la translation
     (*T) = vectG2 - (*R)*vectG1*(*e);
+
+    return true;
 }

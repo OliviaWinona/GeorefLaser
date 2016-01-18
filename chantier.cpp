@@ -113,6 +113,8 @@ bool Chantier::AddResult(std::string fileResult)
         return true;
     }
     m_listeAppariement.push_back(app);
+    app->Pano1()->TousAppariementIm().push_back(app);
+    app->Pano2()->TousAppariementIm().push_back(app);
     return true;
 }
 //------------------------------------------------------------
@@ -140,6 +142,15 @@ bool Chantier::ChargeResult(std::string dossier)
     return true;
 }
 //------------------------------------------------------------
+//------------------------------------------------------------
+bool Chantier::Fini()
+{
+    for(unsigned int i=0 ; i<m_listeAppariement.size() ; i++)
+        if(m_listeAppariement[i]->traite == false)
+            return false;
+    return true;
+}
+
 //------------------------------------------------------------
 Appariement* Chantier::PlusPointsCommum()
 {

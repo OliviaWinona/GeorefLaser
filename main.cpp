@@ -52,7 +52,7 @@ int main(int argc, char **argv)
 {
     InitInternalData();
 
-    std::string nomDossier = "D:\\ProjetInfo\\donnees_test";
+    std::string nomDossier = "D:/ProjetInfo/donnees_test";
 
     if(!projet->ChargePano(nomDossier))
     {
