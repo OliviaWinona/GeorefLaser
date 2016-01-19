@@ -27,8 +27,10 @@ protected:
     bool InitPanos();
     bool AddResult(std::string fileResult);
     Panoramique* FindPano(std::string nom);
-    Appariement* PlusPointsCommum();
-    bool Fini();
+    Appariement* PlusPointsCommun();
+    bool Compensation(Appariement *app);
+    bool TestEchelle(double e);
+    bool TestRotation(Eigen::Matrix3d* rot);
 
 public:
     Chantier(XError* error);
@@ -37,9 +39,11 @@ public:
     // Attributs
     std::string Dossier(){return m_strNomDossier;}
     int NbPoints() {return m_nbPoints;}
+    XError* Error() {return m_error;}
 
     // Méthodes
     bool ChargePano(std::string dossier);
+    bool CreationKey();
     bool ChargeResult(std::string dossier);
     int NbPanoramiques();
     bool Orientation();

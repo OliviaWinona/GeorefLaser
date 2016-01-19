@@ -82,8 +82,11 @@ bool Appariement::ChargeMesures(XError* error, std::string FileResult, int* nbPo
     std::string ligneEnCours;
     std::vector<std::string>decoupage;
     float l1, c1, l2, c2, z1, z2;
+    int cmp = 0;
     while(!file.eof())
     {
+        cmp += 1;
+        cout << cmp << endl;
         decoupage.clear();
         getline(file, ligneEnCours);
         if(ligneEnCours != "")
@@ -142,6 +145,7 @@ bool Appariement::ChargeMesures(XError* error, std::string FileResult, int* nbPo
     return true;
 }
 //------------------------------------------------------------
+//------------------------------------------------------------
 bool Appariement::DejaPresent(std::vector<Point*> lstPts, Point* pt)
 {
     for(unsigned int i=0 ; i<lstPts.size() ; i++)
@@ -155,10 +159,9 @@ bool Appariement::DejaPresent(std::vector<Point*> lstPts, Point* pt)
 std::vector<Point*> Appariement::ChoixQuatrePointsAleatoires(std::vector<Point*> points)
 {
     int rd;
-    srand(time(NULL));
     while(points.size() < 4)
     {
-        rd = rand() % NbPointsApp() + 1;
+        rd = 2 * (rand() % NbPointsApp());
         //cout << "pt " << m_listePoints[rd]->NumPoint() << " & rand " << rd << endl;
         if(DejaPresent(points, m_listePoints[rd]))
             continue;

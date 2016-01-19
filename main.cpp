@@ -54,23 +54,25 @@ int main(int argc, char **argv)
 
     std::string nomDossier = "D:/ProjetInfo/donnees_test";
 
+    XErrorCommentaire(m_error,__FUNCTION__,"\n Charge les panoramiques");
     if(!projet->ChargePano(nomDossier))
     {
         getchar();
         return 0;
     }
+
+    XErrorCommentaire(m_error,__FUNCTION__,"\n Charge les .result");
     if(!projet->ChargeResult(nomDossier))
     {
         getchar();
         return 0;
     }
+    XErrorCommentaire(m_error,__FUNCTION__,"\n Phase d'orientation");
     if(!projet->Orientation())
     {
         getchar();
         return 0;
     }
-
     XErrorCommentaire(m_error,__FUNCTION__, "FIN");
     return 0;
 }
-

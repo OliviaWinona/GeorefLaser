@@ -4,6 +4,8 @@
 #include <vector>
 #include <stdio.h>
 #include <dirent.h>
+#include <stdlib.h>
+#include <time.h>
 
 #include "libXFileSystem/XSystemInfo.h"
 #include "libXFileSystem/XPath.h"
@@ -79,6 +81,14 @@ bool Chantier::ChargePano(std::string dossier)
 }
 //------------------------------------------------------------
 //------------------------------------------------------------
+bool Chantier::CreationKey()
+{
+    cout << m_strNomDossier << endl;
+    return true;
+}
+
+//------------------------------------------------------------
+//------------------------------------------------------------
 Panoramique* Chantier::FindPano(std::string nom)
 {
     for (unsigned int i=0 ; i<m_listePano.size() ; i++)
@@ -139,35 +149,48 @@ bool Chantier::ChargeResult(std::string dossier)
     if (m_listeAppariement.size() == 0)
         return XErrorError(m_error,__FUNCTION__,"pas de result valide dans ce dossier ",dossier.c_str());
 
+    XErrorInfo(m_error,__FUNCTION__,"Nb d'appariements : ",st.itoa(m_listeAppariement.size()).c_str());
     return true;
 }
 //------------------------------------------------------------
 //------------------------------------------------------------
-bool Chantier::Fini()
+Appariement* Chantier::PlusPointsCommun()
 {
-    for(unsigned int i=0 ; i<m_listeAppariement.size() ; i++)
-        if(m_listeAppariement[i]->traite == false)
-            return false;
-    return true;
-}
-
-//------------------------------------------------------------
-Appariement* Chantier::PlusPointsCommum()
-{
-    Appariement* app = m_listeAppariement[0];
+    Appariement* meilleur_app = 0; //pas encore de meilleur
     for(unsigned int i=0 ; i<m_listeAppariement.size() ; i++)
     {
-        if(m_listeAppariement[i]->NbPointsApp() > app->NbPointsApp())
-            app = m_listeAppariement[i];
+        if(m_listeAppariement[i]->traite)
+            continue;
+        if((meilleur_app==0)||(m_listeAppariement[i]->NbPointsApp() > meilleur_app->NbPointsApp()))
+            meilleur_app = m_listeAppariement[i];
     }
-    return app;
+    return meilleur_app; //est un pointeur vers NULL si tout est déjà traité
 }
 //------------------------------------------------------------
-bool Chantier::Orientation()
+bool Chantier::TestEchelle(double e)
 {
-    XErrorInfo(m_error,__FUNCTION__,"Nb d'appariements : ",st.itoa(m_listeAppariement.size()).c_str());
-    Appariement* app = PlusPointsCommum();
-
+    if(abs(e-1) < 0.5)
+        return true;
+    return false;
+}
+//------------------------------------------------------------
+bool Chantier::TestRotation(Eigen::Matrix3d* rot)
+{
+    if(abs((*rot)(0,2)) > 0.08)
+        return false;
+    if(abs((*rot)(1,2)) > 0.08)
+        return false;
+    if(abs((*rot)(2,0)) > 0.08)
+        return false;
+    if(abs((*rot)(2,1)) > 0.08)
+        return false;
+    if(abs((*rot)(2,2)-1) > 0.02)
+        return false;
+    return true;
+}
+//------------------------------------------------------------
+bool Chantier::Compensation(Appariement* app)
+{
     std::vector<Point*> pointsAleatoires;
     pointsAleatoires = app->ChoixQuatrePointsAleatoires(pointsAleatoires);
     std::vector<XPt3D> pointsPano1, pointsPano2;
@@ -176,6 +199,40 @@ bool Chantier::Orientation()
         pointsPano1.push_back(app->Pano1()->GetPoint(pointsAleatoires[i]->NumPoint()));
         pointsPano2.push_back(app->Pano2()->GetPoint(pointsAleatoires[i]->NumPoint()));
     }
-    app->Thomson_Shut(m_error,pointsPano1,pointsPano2,app->Pano1()->Rotation(),app->Pano1()->Translation(),app->Pano1()->Echelle());
+    app->Thomson_Shut(m_error,pointsPano1,pointsPano2,app->Pano2()->Rotation(),app->Pano2()->Translation(),app->Pano2()->Echelle());
+    if(!TestEchelle(*app->Pano2()->Echelle()))
+    {
+        XErrorAlert(m_error,__FUNCTION__,"echelle non valide, on recommence avec de nouveaux points");
+        return false;
+    }
+    cout << "rotation : " << endl << *app->Pano2()->Rotation() << endl;
+    if(!TestRotation(app->Pano2()->Rotation()))
+    {
+        XErrorAlert(m_error,__FUNCTION__,"pas rotation 2D, on recommence avec de nouveaux points");
+        return false;
+    }
+
+    return true;
+}
+//------------------------------------------------------------
+bool Chantier::Orientation()
+{
+    Appariement* app;
+    srand(time(NULL));
+    char message[1024];
+    int comp = 0;
+    while( (app = PlusPointsCommun())  && (comp < 20) )
+    {
+        sprintf(message,"%s et %s : ",app->Pano1()->Nom().c_str(), app->Pano2()->Nom().c_str());
+        XErrorInfo(m_error,__FUNCTION__,message);
+        if(!Compensation(app)) // si un des tests n'est pas bon, on recommence
+        {
+            comp += 1;
+            continue;
+        }
+        app->traite = true;
+
+        comp = 0;
+    }
     return true;
 }

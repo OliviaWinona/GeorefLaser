@@ -15,6 +15,12 @@ Panoramique::~Panoramique(){;}
 //------------------------------------------------------------
 //Chantier* Panoramique::Chantier(){return pChantier;}
 //------------------------------------------------------------
+XError* Panoramique::Error()
+{
+    if(pChantier == NULL)
+        return NULL;
+    return pChantier->Error();
+}
 
 //------------------------------------------------------------
 long GetFileSize(std::ifstream &Fichier)
@@ -73,8 +79,10 @@ bool Panoramique::Init(XError* error)
 //------------------------------------------------------------
 bool Panoramique::GetZ(float l, float c, float* z)
 {
+    char message[1024];
+    sprintf(message,"pas de z, %f ligne, %f colonne", l, c);
     if(m_carteProfondeur[c+l*m_largeur] == 0)
-        return false;
+        return XErrorError(Error(),__FUNCTION__,message, m_strNom.c_str());
     (*z) = m_carteProfondeur[c+l*m_largeur];
     return true;
 }
@@ -91,13 +99,9 @@ int Panoramique::GetNum(float l, float c)
 //------------------------------------------------------------
 XPt3D Panoramique::GetPoint(int num)
 {
-    //std::cout << "taille " << m_tousPointsIm.size() << std::endl;
-    //std::cout << "num debut fonction" << num << std::endl;
     for(unsigned int i=0 ; i<m_tousPointsIm.size() ; i++)
     {
-        //std::cout << "num " << m_tousPointsIm[i]->NumPoint() << std::endl;
         if (m_tousPointsIm[i]->NumPoint() == num)
-            //std::cout << "x " << m_tousPointsIm[i]->Colonne() << std::endl;
             return XPt3D((double)m_tousPointsIm[i]->Colonne(), (double)m_tousPointsIm[i]->Ligne(), (double)m_tousPointsIm[i]->Profondeur());
     }
     return NULL;

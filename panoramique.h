@@ -30,6 +30,7 @@ protected:
 
     //Méthode
     bool calculLargHaut();
+    XError* Error();
 
 public:
     Panoramique(Chantier* parent,std::string nom){pChantier = parent;m_strNom = nom;}
