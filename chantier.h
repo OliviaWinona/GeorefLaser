@@ -44,6 +44,7 @@ public:
     // Méthodes
     bool ChargePano(std::string dossier);
     bool CreationKey();
+    bool CreationResult();
     bool ChargeResult(std::string dossier);
     int NbPanoramiques();
     bool Orientation();

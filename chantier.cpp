@@ -83,10 +83,38 @@ bool Chantier::ChargePano(std::string dossier)
 //------------------------------------------------------------
 bool Chantier::CreationKey()
 {
-    cout << m_strNomDossier << endl;
+    char commande[1024];
+    std::string chemin = m_strNomDossier+"\\";
+    for(unsigned int i=0 ; i<m_listePano.size() ; i++)
+    {
+        XErrorInfo(m_error,__FUNCTION__,"Creation du .key pour la pano : ", m_listePano[i]->Nom().c_str());
+        sprintf(commande,"cd /d %s && siftpp_tgi.exe %s.tif [--first-octave 0] --verbose", chemin.c_str(), m_listePano[i]->Nom().c_str());
+        XErrorInfo(m_error,__FUNCTION__, commande);
+        std::system(commande);
+    }
     return true;
 }
-
+//------------------------------------------------------------
+//------------------------------------------------------------
+bool Chantier::CreationResult()
+{
+    char message[1024];
+    char commande[1024];
+    std::string chemin = m_strNomDossier+"\\";
+    for(unsigned int i=0; i<m_listePano.size() ; i++)
+    {
+        for(unsigned int j=i ; j<m_listePano.size() ; j++)
+        {
+            if(i==j)
+                continue;
+            sprintf(message,"Creation du .result : %s.-.%s.result", m_listePano[i]->Nom().c_str(), m_listePano[j]->Nom().c_str());
+            XErrorInfo(m_error,__FUNCTION__,message);
+            sprintf(commande,"cd /d %s && ann_lowe.exe --kp1 %s.key --kp2 %s.key --verbose", chemin.c_str(), m_listePano[i]->Nom().c_str(), m_listePano[j]->Nom().c_str());
+            std::system(commande);
+        }
+    }
+    return true;
+}
 //------------------------------------------------------------
 //------------------------------------------------------------
 Panoramique* Chantier::FindPano(std::string nom)

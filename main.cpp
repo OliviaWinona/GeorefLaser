@@ -52,7 +52,7 @@ int main(int argc, char **argv)
 {
     InitInternalData();
 
-    std::string nomDossier = "D:/ProjetInfo/donnees_test";
+    std::string nomDossier = "D:\\ProjetInfo\\donnees_test";
 
     XErrorCommentaire(m_error,__FUNCTION__,"\n Charge les panoramiques");
     if(!projet->ChargePano(nomDossier))
@@ -61,12 +61,27 @@ int main(int argc, char **argv)
         return 0;
     }
 
+//    XErrorCommentaire(m_error,__FUNCTION__,"\n Creation des .key");
+//    if(!projet->CreationKey())
+//    {
+//        getchar();
+//        return 0;
+//    }
+
+//    XErrorCommentaire(m_error,__FUNCTION__,"\n Creation des .result");
+//    if(!projet->CreationResult())
+//    {
+//        getchar();
+//        return 0;
+//    }
+
     XErrorCommentaire(m_error,__FUNCTION__,"\n Charge les .result");
     if(!projet->ChargeResult(nomDossier))
     {
         getchar();
         return 0;
     }
+
     XErrorCommentaire(m_error,__FUNCTION__,"\n Phase d'orientation");
     if(!projet->Orientation())
     {
