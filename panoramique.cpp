@@ -10,6 +10,7 @@
 #include "appariement.h"
 #include "chantier.h"
 
+using namespace std;
 
 Panoramique::~Panoramique(){;}
 //------------------------------------------------------------
@@ -66,6 +67,21 @@ bool Panoramique::ChargeCarteProfondeur()
     m_carteProfondeur.resize(m_largeur * m_hauteur,0);
     file.read((char*)&m_carteProfondeur[0], sizeof(float)*m_largeur*m_hauteur);
     file.close();
+
+    //Ecriture de la carte de profondeur dans un fichier texte : Debbug
+//    ofstream fichierOut;
+//    std::string nomFichierOut = "test"+ m_strNom + ".txt";
+//    fichierOut.open(nomFichierOut.c_str());
+//    if(!fichierOut.is_open())
+//        return false;
+//    for(int l=0 ; l<m_hauteur ; l++)
+//    {
+//        for(int c=0 ; c<m_largeur ; c++)
+//            fichierOut << "c" << c << " " <<m_carteProfondeur[c+l*m_largeur] << " ";
+//        fichierOut << "\n";
+//    }
+//    fichierOut.close();
+
     return true;
 }
 //------------------------------------------------------------
@@ -77,10 +93,10 @@ bool Panoramique::Init(XError* error)
     return true;
 }
 //------------------------------------------------------------
-bool Panoramique::GetZ(float l, float c, float* z)
+bool Panoramique::GetZ(int l, int c, float* z)
 {
     char message[1024];
-    sprintf(message,"pas de z, %f ligne, %f colonne", l, c);
+    sprintf(message,"pas de z, %i ligne, %i colonne", l, c);
     if(m_carteProfondeur[c+l*m_largeur] == 0)
         return XErrorError(Error(),__FUNCTION__,message, m_strNom.c_str());
     (*z) = m_carteProfondeur[c+l*m_largeur];

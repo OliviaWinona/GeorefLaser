@@ -51,7 +51,7 @@ public:
     //Méthodes
     bool Init(XError* error);
     bool ChargeCarteProfondeur();
-    bool GetZ(float l, float c, float* z);
+    bool GetZ(int l, int c, float* z);
     int GetNum(float l, float c);
     XPt3D GetPoint(int num);
 };

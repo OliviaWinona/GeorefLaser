@@ -4,6 +4,7 @@
 #include <vector>
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 #include <Eigen/Dense>
 
 #include "libXBase/XStringTools.h"
@@ -82,11 +83,8 @@ bool Appariement::ChargeMesures(XError* error, std::string FileResult, int* nbPo
     std::string ligneEnCours;
     std::vector<std::string>decoupage;
     float l1, c1, l2, c2, z1, z2;
-    int cmp = 0;
     while(!file.eof())
     {
-        cmp += 1;
-        cout << cmp << endl;
         decoupage.clear();
         getline(file, ligneEnCours);
         if(ligneEnCours != "")
@@ -97,9 +95,9 @@ bool Appariement::ChargeMesures(XError* error, std::string FileResult, int* nbPo
             c2 = atof(decoupage[2].c_str());
             l2 = atof(decoupage[3].c_str());
 
-            if(!m_image1->GetZ(l1,c1,&z1))
+            if(!m_image1->GetZ((int)round(l1),(int)round(c1),&z1))
                 continue;
-            if(!m_image2->GetZ(l2,c2,&z2))
+            if(!m_image2->GetZ((int)round(l2),(int)round(c2),&z2))
                 continue;
 
             int num1 = m_image1->GetNum(l1, c1);
@@ -141,7 +139,8 @@ bool Appariement::ChargeMesures(XError* error, std::string FileResult, int* nbPo
         return false;
     }
 
-    XErrorInfo(error,__FUNCTION__,"Nb points homologues : ",st.itoa(NbPointsApp()).c_str());
+    sprintf(message,"Nb points homologues : %i \n", NbPointsApp());
+    XErrorInfo(error,__FUNCTION__,message);
     return true;
 }
 //------------------------------------------------------------
