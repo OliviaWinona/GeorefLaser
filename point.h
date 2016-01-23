@@ -2,6 +2,7 @@
 #define POINT_H
 #include <iostream>
 #include <vector>
+#include <Eigen/Dense>
 
 class Point
 {
@@ -22,6 +23,12 @@ public:
     float Colonne() {return m_colonne;} //x
     float Profondeur() {return m_z;} // z
 
+    //Méthodes
+    Point TransfPoint(Eigen::Matrix3d r, Eigen::Vector3d t, double e);
+    double distance(Point* pt1, Point pt2);
+
 };
 
 #endif // POINT_H
+
+void AffichePoint(Point);

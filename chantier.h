@@ -29,8 +29,7 @@ protected:
     Panoramique* FindPano(std::string nom);
     Appariement* PlusPointsCommun();
     bool Compensation(Appariement *app);
-    bool TestEchelle(double e);
-    bool TestRotation(Eigen::Matrix3d* rot);
+    bool TestDistance(std::vector<Point*> pts1, std::vector<Point> pts2);
 
 public:
     Chantier(XError* error);

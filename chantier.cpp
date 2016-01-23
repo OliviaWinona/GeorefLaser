@@ -195,28 +195,6 @@ Appariement* Chantier::PlusPointsCommun()
     return meilleur_app; //est un pointeur vers NULL si tout est déjà traité
 }
 //------------------------------------------------------------
-bool Chantier::TestEchelle(double e)
-{
-    if(abs(e-1) < 0.5)
-        return true;
-    return false;
-}
-//------------------------------------------------------------
-bool Chantier::TestRotation(Eigen::Matrix3d* rot)
-{
-    if(abs((*rot)(0,2)) > 0.08)
-        return false;
-    if(abs((*rot)(1,2)) > 0.08)
-        return false;
-    if(abs((*rot)(2,0)) > 0.08)
-        return false;
-    if(abs((*rot)(2,1)) > 0.08)
-        return false;
-    if(abs((*rot)(2,2)-1) > 0.02)
-        return false;
-    return true;
-}
-//------------------------------------------------------------
 bool Chantier::Compensation(Appariement* app)
 {
     std::vector<Point*> pointsAleatoires;
@@ -224,22 +202,28 @@ bool Chantier::Compensation(Appariement* app)
     std::vector<XPt3D> pointsPano1, pointsPano2;
     for(unsigned int i=0 ; i<pointsAleatoires.size() ; i++)
     {
-        pointsPano1.push_back(app->Pano1()->GetPoint(pointsAleatoires[i]->NumPoint()));
-        pointsPano2.push_back(app->Pano2()->GetPoint(pointsAleatoires[i]->NumPoint()));
+        pointsPano1.push_back(app->Pano1()->GetPointXPt3D(pointsAleatoires[i]->NumPoint()));
+        pointsPano2.push_back(app->Pano2()->GetPointXPt3D(pointsAleatoires[i]->NumPoint()));
     }
-    app->Thomson_Shut(m_error,pointsPano1,pointsPano2,app->Pano2()->Rotation(),app->Pano2()->Translation(),app->Pano2()->Echelle());
-    if(!TestEchelle(*app->Pano2()->Echelle()))
+    app->Thomson_Shut(m_error, pointsPano1, pointsPano2, &app->rot_app, &app->trans_app, &app->echelle_app);
+    if(!app->TestEchelle())
     {
         XErrorAlert(m_error,__FUNCTION__,"echelle non valide, on recommence avec de nouveaux points");
         return false;
     }
-    cout << "rotation : " << endl << *app->Pano2()->Rotation() << endl;
-    if(!TestRotation(app->Pano2()->Rotation()))
+    cout << "rotation : " << endl << app->rot_app << endl;
+    if(!app->TestRotation())
     {
         XErrorAlert(m_error,__FUNCTION__,"pas rotation 2D, on recommence avec de nouveaux points");
         return false;
     }
-
+    std::vector<Point> ptsCompenses;
+    ptsCompenses = app->PointsCompense();
+    if(!app->TestDistance(ptsCompenses))
+    {
+        XErrorAlert(m_error,__FUNCTION__,"transformation non valide, on recommence");
+        return false;
+    }
     return true;
 }
 //------------------------------------------------------------
@@ -248,19 +232,13 @@ bool Chantier::Orientation()
     Appariement* app;
     srand(time(NULL));
     char message[1024];
-    int comp = 0;
-    while( (app = PlusPointsCommun())  && (comp < 20) )
+    while(app = PlusPointsCommun())
     {
         sprintf(message,"%s et %s : ",app->Pano1()->Nom().c_str(), app->Pano2()->Nom().c_str());
         XErrorInfo(m_error,__FUNCTION__,message);
         if(!Compensation(app)) // si un des tests n'est pas bon, on recommence
-        {
-            comp += 1;
             continue;
-        }
         app->traite = true;
-
-        comp = 0;
     }
     return true;
 }

@@ -103,17 +103,17 @@ bool Panoramique::GetZ(int l, int c, float* z)
     return true;
 }
 //------------------------------------------------------------
-int Panoramique::GetNum(float l, float c)
+Point* Panoramique::GetPt(float l, float c)
 {
     for(unsigned int i=0 ; i<m_tousPointsIm.size() ; i++)
     {
         if (m_tousPointsIm[i]->Ligne() == l && m_tousPointsIm[i]->Colonne() == c)
-            return m_tousPointsIm[i]->NumPoint();
+            return m_tousPointsIm[i];
     }
     return 0;
 }
 //------------------------------------------------------------
-XPt3D Panoramique::GetPoint(int num)
+XPt3D Panoramique::GetPointXPt3D(int num)
 {
     for(unsigned int i=0 ; i<m_tousPointsIm.size() ; i++)
     {
@@ -121,4 +121,10 @@ XPt3D Panoramique::GetPoint(int num)
             return XPt3D((double)m_tousPointsIm[i]->Colonne(), (double)m_tousPointsIm[i]->Ligne(), (double)m_tousPointsIm[i]->Profondeur());
     }
     return NULL;
+}
+//------------------------------------------------------------
+bool Panoramique::AjoutPoint(Point* pt)
+{
+    tousPointsIm().push_back(pt);
+    return true;
 }

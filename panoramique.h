@@ -44,16 +44,17 @@ public:
     std::vector<Point*> & tousPointsIm() {return m_tousPointsIm;}
     std::vector<float> & CarteProfondeur() {return m_carteProfondeur;}
     std::vector<Appariement*> & TousAppariementIm() {return m_apparie;}
-    Eigen::Matrix3d* Rotation() {return &m_rotation;}
-    Eigen::Vector3d* Translation() {return &m_translation;}
-    double* Echelle() {return &m_echelle;}
+//    Eigen::Matrix3d* Rotation() {return &m_rotation;}
+//    Eigen::Vector3d* Translation() {return &m_translation;}
+//    double* Echelle() {return &m_echelle;}
 
     //Méthodes
     bool Init(XError* error);
     bool ChargeCarteProfondeur();
     bool GetZ(int l, int c, float* z);
-    int GetNum(float l, float c);
-    XPt3D GetPoint(int num);
+    Point* GetPt(float l, float c);
+    XPt3D GetPointXPt3D(int num);
+    bool AjoutPoint(Point* pt);
 };
 
 #endif // PANORAMIQUE_H

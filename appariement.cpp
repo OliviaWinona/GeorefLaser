@@ -27,22 +27,15 @@ Appariement::~Appariement()
 {
 }
 //------------------------------------------------------------
-int Appariement::NbPointsApp() {return m_listePoints.size()/2;}
-//------------------------------------------------------------
-bool Appariement::AjoutPoint(int num, float l, float c, float z, Panoramique* pano)
-{
-    Point* pt = new Point(num, l, c, z);
-    m_listePoints.push_back(pt);
-    pano->tousPointsIm().push_back(pt);
-    return true;
-}
+int Appariement::NbPointsApp() {return m_listePointsPano1.size();}
 //------------------------------------------------------------
 bool Appariement::Nettoyage(Panoramique* pano1, Panoramique* pano2)
 {
-    int nb = m_listePoints.size()/2;
+    int nb = m_listePointsPano1.size();
     pano1->tousPointsIm().erase(pano1->tousPointsIm().end()-nb, pano1->tousPointsIm().end());
     pano2->tousPointsIm().erase(pano2->tousPointsIm().end()-nb, pano2->tousPointsIm().end());
-    m_listePoints.clear();
+    m_listePointsPano1.clear();
+    m_listePointsPano2.clear();
     return true;
 }
 //------------------------------------------------------------
@@ -100,29 +93,46 @@ bool Appariement::ChargeMesures(XError* error, std::string FileResult, int* nbPo
             if(!m_image2->GetZ((int)round(l2),(int)round(c2),&z2))
                 continue;
 
-            int num1 = m_image1->GetNum(l1, c1);
-            int num2 = m_image2->GetNum(l2, c2);
+            Point* pt1 = m_image1->GetPt(l1, c1);
+            Point* pt2 = m_image2->GetPt(l2, c2);
 
-            if(num1 != 0) //point déjà existant sur la pano 1
+            if(pt1 && pt2) // point déjà existant dans les 2 panos
             {
-                sprintf(message,"Point %s deja trouve dans pano %s",st.itoa(num1).c_str(),m_image1->Nom().c_str());
-                XErrorInfo(error,__FUNCTION__,message);
-                AjoutPoint(num1, l2, c2, z2, m_image2);
+                sprintf(message,"Point %s deja trouve dans les pano %s et %s", st.itoa(pt1->NumPoint()).c_str(), m_image1->Nom().c_str(), m_image2->Nom().c_str());
+                XErrorInfo(error,__FUNCTION__, message);
                 continue;
             }
 
-            if(num2 != 0) //point déjà existant sur la pano 2
+            if(pt1) //point déjà existant sur la pano 1
             {
-                sprintf(message,"Point %s deja trouve dans pano %s",st.itoa(num2).c_str(),m_image2->Nom().c_str());
+                sprintf(message,"Point %s deja trouve dans pano %s",st.itoa(pt1->NumPoint()).c_str(),m_image1->Nom().c_str());
                 XErrorInfo(error,__FUNCTION__,message);
-                AjoutPoint(num2, l1, c1, z1, m_image1);
+                m_listePointsPano1.push_back(pt1);
+                pt2 = new Point(pt1->NumPoint(), l2, c2, z2);
+                m_image2->AjoutPoint(pt2);
+                m_listePointsPano2.push_back(pt2);
+                continue;
+            }
+
+            if(pt2) //point déjà existant sur la pano 2
+            {
+                sprintf(message,"Point %s deja trouve dans pano %s",st.itoa(pt2->NumPoint()).c_str(),m_image2->Nom().c_str());
+                XErrorInfo(error,__FUNCTION__,message);
+                m_listePointsPano2.push_back(pt2);
+                pt1 = new Point(pt2->NumPoint(), l1, c1, z1);
+                m_image1->AjoutPoint(pt1);
+                m_listePointsPano1.push_back(pt1);
                 continue;
             }
 
             //point non existant
             (*nbPoints) = (*nbPoints) + 1;
-            AjoutPoint(*nbPoints, l1, c1, z1, m_image1);
-            AjoutPoint(*nbPoints, l2, c2, z2, m_image2);
+            pt1 = new Point(*nbPoints, l1, c1, z1);
+            pt2 = new Point(*nbPoints, l2, c2, z2);
+            m_listePointsPano1.push_back(pt1);
+            m_image1->AjoutPoint(pt1);
+            m_listePointsPano2.push_back(pt2);
+            m_image2->AjoutPoint(pt2);
         }
     }
     file.close();
@@ -139,6 +149,12 @@ bool Appariement::ChargeMesures(XError* error, std::string FileResult, int* nbPo
         return false;
     }
 
+//    for(int i=0 ; i<NbPointsApp() ; i++)
+//    {
+//        cout << NbPointsApp() << endl;
+//        cout << i << endl;
+//        cout << m_listePointsPano1[i]->NumPoint() << " " << m_listePointsPano2[i]->NumPoint() << endl;
+//    }
     sprintf(message,"Nb points homologues : %i \n", NbPointsApp());
     XErrorInfo(error,__FUNCTION__,message);
     return true;
@@ -157,15 +173,16 @@ bool Appariement::DejaPresent(std::vector<Point*> lstPts, Point* pt)
 //------------------------------------------------------------
 std::vector<Point*> Appariement::ChoixQuatrePointsAleatoires(std::vector<Point*> points)
 {
+    //On n'a besoin que du numéro du point
     int rd;
     while(points.size() < 4)
     {
-        rd = 2 * (rand() % NbPointsApp());
-        //cout << "pt " << m_listePoints[rd]->NumPoint() << " & rand " << rd << endl;
-        if(DejaPresent(points, m_listePoints[rd]))
+        rd = rand() % NbPointsApp();
+        //cout << "pt " << m_listePointsPano1[rd]->NumPoint() << " & rand " << rd << endl;
+        if(DejaPresent(points, m_listePointsPano1[rd]))
             continue;
 
-        points.push_back(m_listePoints[rd]);
+        points.push_back(m_listePointsPano1[rd]);
     }
 
     return points;
@@ -279,5 +296,45 @@ bool Appariement::Thomson_Shut(XError* error, std::vector<XPt3D> &ptPano1,std::v
     // Calcul de la translation
     (*T) = vectG2 - (*R)*vectG1*(*e);
 
+    return true;
+}
+//------------------------------------------------------------
+bool Appariement::TestRotation()
+{
+    if(abs(rot_app(0,2)) > 0.08)
+        return false;
+    if(abs(rot_app(1,2)) > 0.08)
+        return false;
+    if(abs(rot_app(2,0)) > 0.08)
+        return false;
+    if(abs(rot_app(2,1)) > 0.08)
+        return false;
+    if(abs(rot_app(2,2)-1) > 0.02)
+        return false;
+    return true;
+}
+//------------------------------------------------------------
+bool Appariement::TestEchelle()
+{
+    if(abs(echelle_app - 1) > 0.5)
+        return false;
+    return true;
+}
+//------------------------------------------------------------
+std::vector<Point> Appariement::PointsCompense()
+{
+    std::vector<Point> ptsComp;
+    for(unsigned int i=0 ; i<NbPointsApp() ; i++)
+        ptsComp.push_back(m_listePointsPano2[i]->TransfPoint(rot_app, trans_app, echelle_app));
+    return ptsComp;
+}
+//------------------------------------------------------------
+bool Appariement::TestDistance(std::vector<Point> pts2)
+{
+    int cmp=0;
+    for(unsigned int i=0 ; i<pts1.size() ; i++)
+    {
+        //cout << pts1[i]->distance(pts1[i], pts2[1]) << endl;
+    }
     return true;
 }
