@@ -288,16 +288,9 @@ bool Chantier::Cheminement()
             app = PlusPointsCommun(m_listePano[0]->Nom(), panos_precedentes);
             m_listePano[0]->valide = true;
             panos_precedentes.push_back(m_listePano[0]);
-
             pano = app->Pano2();
-//            *pano->Rotation() = app->rot_app;
-//            *pano->Translation() = app->trans_app;
-//            *pano->Echelle() = app->echelle_app;
-//            pano->valide = true;
             continue;
         }
-        cout << pano->Nom() << endl;
-
         int signe = 1;
         for(unsigned int j=panos_precedentes.size() ; j>0 ; j--)
         {
@@ -334,6 +327,10 @@ bool Chantier::Orientation()
     }
     if(!Cheminement())
         XErrorAlert(m_error,__FUNCTION__,"echec de la complétion des matrices de rotation, translation et echelle");
-
+    for(unsigned int i=0 ; i<m_listePano.size() ; i++)
+    {
+        if(!m_listePano[i]->EcrireXYZ())
+            XErrorAlert(m_error,__FUNCTION__,"ecriture du fichier non reussie", m_listePano[i]->Nom().c_str());
+    }
     return true;
 }

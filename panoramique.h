@@ -56,6 +56,7 @@ public:
     Point* GetPt(float l, float c);
     XPt3D GetPointXPt3D(int num);
     bool AjoutPoint(Point* pt);
+    bool EcrireXYZ();
 };
 
 #endif // PANORAMIQUE_H

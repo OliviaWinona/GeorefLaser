@@ -100,7 +100,10 @@ bool Panoramique::GetZ(int l, int c, float* z)
     char message[1024];
     sprintf(message,"pas de z, %i ligne, %i colonne", l, c);
     if(m_carteProfondeur[c+l*m_largeur] == 0)
-        return XErrorError(Error(),__FUNCTION__,message, m_strNom.c_str());
+    {
+        XErrorAlert(Error(),__FUNCTION__,message, m_strNom.c_str());
+        return false;
+    }
     (*z) = m_carteProfondeur[c+l*m_largeur];
     return true;
 }
@@ -128,5 +131,26 @@ XPt3D Panoramique::GetPointXPt3D(int num)
 bool Panoramique::AjoutPoint(Point* pt)
 {
     tousPointsIm().push_back(pt);
+    return true;
+}
+//------------------------------------------------------------
+bool Panoramique::EcrireXYZ()
+{
+    std::string const emplacement = Chantier()->Dossier() + "\\" + m_strNom + ".XYZ";
+    ofstream fichierOut(emplacement);
+    if(!fichierOut)
+        return false;
+    for(unsigned int i=0 ; i<m_tousPointsIm.size() ; i++)
+    {
+        fichierOut << m_tousPointsIm[i]->NumPoint() << " " << m_tousPointsIm[i]->Colonne() << " " << m_tousPointsIm[i]->Ligne() << " " << m_tousPointsIm[i]->Profondeur() << " 0.05\n";
+    }
+    fichierOut << "* Station : " << m_strNom << "\n";
+    fichierOut << m_translation(0) << " " << m_translation(1) << " " << m_translation(2) << "\n";
+    fichierOut << m_rotation(0,0) << " " << m_rotation(0,1) << " " << m_rotation(0,2) << "\n";
+    fichierOut << m_rotation(1,0) << " " << m_rotation(1,1) << " " << m_rotation(1,2) << "\n";
+    fichierOut << m_rotation(2,0) << " " << m_rotation(2,1) << " " << m_rotation(2,2) << "\n";
+
+    fichierOut.close();
+    XErrorInfo(Error(),__FUNCTION__,"ecriture reussie",m_strNom.c_str());
     return true;
 }
