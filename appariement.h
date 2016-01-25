@@ -34,10 +34,10 @@ public:
     std::vector<Point*> & PointsPano2() {return m_listePointsPano2;}
 
     bool traite = false;
-    bool valide = false;
     Eigen::Matrix3d rot_app;
     Eigen::Vector3d trans_app;
     double echelle_app;
+    bool utilise = false;
 
     // Méthodes
     bool ChargeMesures(XError* error, std::string FileResult, int *nbPoints);
@@ -47,7 +47,7 @@ public:
     std::vector<Point> PointsCompense();
     bool TestRotation();
     bool TestEchelle();
-    bool TestDistance(std::vector<Point> pts2);
+    bool TestDistance();
 
 };
 

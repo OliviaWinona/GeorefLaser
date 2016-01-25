@@ -12,9 +12,11 @@
 
 using namespace std;
 
-Panoramique::~Panoramique(){;}
-//------------------------------------------------------------
-//Chantier* Panoramique::Chantier(){return pChantier;}
+Panoramique::~Panoramique()
+{
+    for(unsigned int i=0 ; i<m_tousPointsIm.size() ; i++)
+        delete m_tousPointsIm[i];
+}
 //------------------------------------------------------------
 XError* Panoramique::Error()
 {

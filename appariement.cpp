@@ -29,6 +29,8 @@ Appariement::~Appariement()
 //------------------------------------------------------------
 int Appariement::NbPointsApp() {return m_listePointsPano1.size();}
 //------------------------------------------------------------
+//--------------Partie Chargement des .result-----------------
+//------------------------------------------------------------
 bool Appariement::Nettoyage(Panoramique* pano1, Panoramique* pano2)
 {
     int nb = m_listePointsPano1.size();
@@ -160,6 +162,7 @@ bool Appariement::ChargeMesures(XError* error, std::string FileResult, int* nbPo
     return true;
 }
 //------------------------------------------------------------
+//-------------------Partie Orientation-----------------------
 //------------------------------------------------------------
 bool Appariement::DejaPresent(std::vector<Point*> lstPts, Point* pt)
 {
@@ -324,17 +327,31 @@ bool Appariement::TestEchelle()
 std::vector<Point> Appariement::PointsCompense()
 {
     std::vector<Point> ptsComp;
-    for(unsigned int i=0 ; i<NbPointsApp() ; i++)
+    for(int i=0 ; i<NbPointsApp() ; i++)
         ptsComp.push_back(m_listePointsPano2[i]->TransfPoint(rot_app, trans_app, echelle_app));
     return ptsComp;
 }
 //------------------------------------------------------------
-bool Appariement::TestDistance(std::vector<Point> pts2)
+bool Appariement::TestDistance()
 {
-    int cmp=0;
-    for(unsigned int i=0 ; i<pts1.size() ; i++)
+    std::vector<Point> ptsCompenses;
+    ptsCompenses = PointsCompense();
+    int distance;
+    std::vector<double> d;
+    //cout << ptsCompenses.size() << " " << NbPointsApp() << endl;
+    for(int i=0 ; i<NbPointsApp() ; i++)
     {
-        //cout << pts1[i]->distance(pts1[i], pts2[1]) << endl;
+        //AffichePoint(*m_listePointsPano1[i]);
+        //AffichePoint(ptsCompenses[i]);
+        distance = distance2D(*m_listePointsPano1[i], ptsCompenses[1]);
+        if(ptsCompenses[i].Profondeur() <= 0)
+            continue;
+        if(distance > 1000)
+            continue;
+        d.push_back(distance);
     }
+    cout << "points ok / points totals : " << d.size() << " / " << ptsCompenses.size() << endl;
+    if((d.size() * 100 / ptsCompenses.size()) < 60)
+        return false;
     return true;
 }

@@ -88,6 +88,8 @@ int main(int argc, char **argv)
         getchar();
         return 0;
     }
+
+    delete projet;
     XErrorCommentaire(m_error,__FUNCTION__, "FIN");
     return 0;
 }

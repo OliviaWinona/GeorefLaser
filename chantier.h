@@ -27,9 +27,11 @@ protected:
     bool InitPanos();
     bool AddResult(std::string fileResult);
     Panoramique* FindPano(std::string nom);
-    Appariement* PlusPointsCommun();
+    Appariement* PlusPointsCommun(std::string nom, std::vector<Panoramique*> pano_prec);
+    Appariement* NonTraite();
     bool Compensation(Appariement *app);
     bool TestDistance(std::vector<Point*> pts1, std::vector<Point> pts2);
+    bool Cheminement();
 
 public:
     Chantier(XError* error);

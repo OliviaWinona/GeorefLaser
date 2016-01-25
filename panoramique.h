@@ -23,9 +23,9 @@ protected:
     long m_hauteur;
     std::vector<Appariement*> m_apparie;
     std::vector<Point*> m_tousPointsIm;
-    Eigen::Matrix3d m_rotation;
-    Eigen::Vector3d m_translation;
-    double m_echelle;
+    Eigen::Matrix3d m_rotation = Eigen::Matrix3d::Identity();
+    Eigen::Vector3d m_translation = Eigen::Vector3d::Zero();
+    double m_echelle = 1;
     std::vector<float> m_carteProfondeur;
 
     //Méthode
@@ -44,9 +44,10 @@ public:
     std::vector<Point*> & tousPointsIm() {return m_tousPointsIm;}
     std::vector<float> & CarteProfondeur() {return m_carteProfondeur;}
     std::vector<Appariement*> & TousAppariementIm() {return m_apparie;}
-//    Eigen::Matrix3d* Rotation() {return &m_rotation;}
-//    Eigen::Vector3d* Translation() {return &m_translation;}
-//    double* Echelle() {return &m_echelle;}
+    Eigen::Matrix3d* Rotation() {return &m_rotation;}
+    Eigen::Vector3d* Translation() {return &m_translation;}
+    double* Echelle() {return &m_echelle;}
+    bool valide = false;
 
     //Méthodes
     bool Init(XError* error);

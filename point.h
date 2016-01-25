@@ -25,10 +25,11 @@ public:
 
     //Méthodes
     Point TransfPoint(Eigen::Matrix3d r, Eigen::Vector3d t, double e);
-    double distance(Point* pt1, Point pt2);
+
 
 };
 
 #endif // POINT_H
 
-void AffichePoint(Point);
+void AffichePoint(Point pt);
+double distance2D(Point pt1, Point pt2);

@@ -23,9 +23,15 @@ Chantier::Chantier(XError* error) : m_strNomDossier("")
 //------------------------------------------------------------
 Chantier::~Chantier()
 {
+    for(unsigned int i=0 ; i<m_listePano.size() ; i++)
+        delete m_listePano[i];
+    for(unsigned int i=0 ; i<m_listeAppariement.size() ; i++)
+        delete m_listeAppariement[i];
 }
 //------------------------------------------------------------
 int Chantier::NbPanoramiques() {return m_listePano.size();}
+//------------------------------------------------------------
+//-----------------Partie Chargement des panos----------------
 //------------------------------------------------------------
 bool Chantier::InitPanos()
 {
@@ -80,6 +86,7 @@ bool Chantier::ChargePano(std::string dossier)
     return InitPanos();
 }
 //------------------------------------------------------------
+//-----------------Partie Création des .key-------------------
 //------------------------------------------------------------
 bool Chantier::CreationKey()
 {
@@ -95,6 +102,7 @@ bool Chantier::CreationKey()
     return true;
 }
 //------------------------------------------------------------
+//----------------Partie Création des .result-----------------
 //------------------------------------------------------------
 bool Chantier::CreationResult()
 {
@@ -116,6 +124,7 @@ bool Chantier::CreationResult()
     return true;
 }
 //------------------------------------------------------------
+//--------------Partie Chargement des .result-----------------
 //------------------------------------------------------------
 Panoramique* Chantier::FindPano(std::string nom)
 {
@@ -181,18 +190,19 @@ bool Chantier::ChargeResult(std::string dossier)
     return true;
 }
 //------------------------------------------------------------
+//-------------------Partie Orientation-----------------------
 //------------------------------------------------------------
-Appariement* Chantier::PlusPointsCommun()
+Appariement* Chantier::NonTraite()
 {
-    Appariement* meilleur_app = 0; //pas encore de meilleur
+    Appariement* app = 0;
     for(unsigned int i=0 ; i<m_listeAppariement.size() ; i++)
     {
         if(m_listeAppariement[i]->traite)
             continue;
-        if((meilleur_app==0)||(m_listeAppariement[i]->NbPointsApp() > meilleur_app->NbPointsApp()))
-            meilleur_app = m_listeAppariement[i];
+        app = m_listeAppariement[i];
+        break;
     }
-    return meilleur_app; //est un pointeur vers NULL si tout est déjà traité
+    return app; //est un pointeur vers NULL si tout est déjà traité
 }
 //------------------------------------------------------------
 bool Chantier::Compensation(Appariement* app)
@@ -211,18 +221,100 @@ bool Chantier::Compensation(Appariement* app)
         XErrorAlert(m_error,__FUNCTION__,"echelle non valide, on recommence avec de nouveaux points");
         return false;
     }
-    cout << "rotation : " << endl << app->rot_app << endl;
+    //cout << "rotation : " << endl << app->rot_app << endl;
     if(!app->TestRotation())
     {
         XErrorAlert(m_error,__FUNCTION__,"pas rotation 2D, on recommence avec de nouveaux points");
         return false;
     }
-    std::vector<Point> ptsCompenses;
-    ptsCompenses = app->PointsCompense();
-    if(!app->TestDistance(ptsCompenses))
+//    if(!app->TestDistance())
+//    {
+//        XErrorAlert(m_error,__FUNCTION__,"transformation non valide, on recommence");
+//        return false;
+//    }
+    XErrorInfo(m_error,__FUNCTION__,"Transfo ok !");
+    return true;
+}
+//------------------------------------------------------------
+Appariement* Chantier::PlusPointsCommun(std::string nom, std::vector<Panoramique*> pano_prec)
+{
+    Appariement* meilleur_app = 0;
+    for(unsigned int i=0 ; i<m_listeAppariement.size() ; i++)
     {
-        XErrorAlert(m_error,__FUNCTION__,"transformation non valide, on recommence");
-        return false;
+        if((m_listeAppariement[i]->Pano1()->Nom() != nom) && (m_listeAppariement[i]->Pano2()->Nom() != nom))
+            continue;
+        if(m_listeAppariement[i]->utilise)
+            continue;
+        if((meilleur_app == 0) || (m_listeAppariement[i]->NbPointsApp() > meilleur_app->NbPointsApp()))
+            meilleur_app = m_listeAppariement[i];
+    }
+    std::string nom_pano;
+    bool tmp = false;
+    for(unsigned int i=pano_prec.size() ; i>0 ; i--)
+    {
+        nom_pano = pano_prec[i-1]->Nom();
+        for(unsigned int j=0 ; j<m_listeAppariement.size() ; j++)
+        {
+            if(m_listeAppariement[j]->utilise)
+                continue;
+            if((m_listeAppariement[j]->Pano1()->Nom() != nom_pano) && (m_listeAppariement[j]->Pano2()->Nom() != nom_pano))
+                continue;
+            if(m_listeAppariement[j]->NbPointsApp() > meilleur_app->NbPointsApp())
+            {
+                meilleur_app = m_listeAppariement[j];
+                tmp = true;
+            }
+        }
+        if (tmp)
+        {
+            pano_prec.erase(pano_prec.end()-pano_prec.size()+i, pano_prec.end());
+            break;
+        }
+    }
+    meilleur_app->utilise = true;
+    return meilleur_app;
+}
+//------------------------------------------------------------
+bool Chantier::Cheminement()
+{
+    int nbPano = m_listePano.size();
+    Appariement* app;
+    Panoramique* pano;
+    std::vector<Panoramique*> panos_precedentes;
+    for(int i=0 ; i<nbPano ; i++)
+    {
+        if(i == 0)
+        {
+            app = PlusPointsCommun(m_listePano[0]->Nom(), panos_precedentes);
+            m_listePano[0]->valide = true;
+            panos_precedentes.push_back(m_listePano[0]);
+
+            pano = app->Pano2();
+//            *pano->Rotation() = app->rot_app;
+//            *pano->Translation() = app->trans_app;
+//            *pano->Echelle() = app->echelle_app;
+//            pano->valide = true;
+            continue;
+        }
+        cout << pano->Nom() << endl;
+
+        int signe = 1;
+        for(unsigned int j=panos_precedentes.size() ; j>0 ; j--)
+        {
+            //Attention au sens de la transformation
+            if(app->Pano2()->Nom() == panos_precedentes[j-1]->Nom())
+                signe = -1;
+
+            //passage des coordonnées de la pano dans le repère de la pano précédente
+            *pano->Rotation() = *pano->Rotation() * signe * app->rot_app;
+            *pano->Translation() = *pano->Translation() + signe * app->trans_app;
+            *pano->Echelle() = *pano->Echelle() * signe* app->echelle_app;
+        }
+        app = PlusPointsCommun(pano->Nom(), panos_precedentes);
+        if(app->Pano1()->Nom() == pano->Nom())
+            pano = app->Pano2();
+        else
+            pano = app->Pano1();
     }
     return true;
 }
@@ -232,13 +324,16 @@ bool Chantier::Orientation()
     Appariement* app;
     srand(time(NULL));
     char message[1024];
-    while(app = PlusPointsCommun())
+    while(app = NonTraite())
     {
-        sprintf(message,"%s et %s : ",app->Pano1()->Nom().c_str(), app->Pano2()->Nom().c_str());
+        sprintf(message,"%s et %s ",app->Pano1()->Nom().c_str(), app->Pano2()->Nom().c_str());
         XErrorInfo(m_error,__FUNCTION__,message);
         if(!Compensation(app)) // si un des tests n'est pas bon, on recommence
             continue;
         app->traite = true;
     }
+    if(!Cheminement())
+        XErrorAlert(m_error,__FUNCTION__,"echec de la complétion des matrices de rotation, translation et echelle");
+
     return true;
 }
