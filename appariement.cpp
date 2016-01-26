@@ -355,3 +355,34 @@ bool Appariement::TestDistance()
         return false;
     return true;
 }
+//------------------------------------------------------------
+bool Appariement::Compensation(XError* error)
+{
+    std::vector<Point*> pointsAleatoires;
+    pointsAleatoires = ChoixQuatrePointsAleatoires(pointsAleatoires);
+    std::vector<XPt3D> pointsPano1, pointsPano2;
+    for(unsigned int i=0 ; i<pointsAleatoires.size() ; i++)
+    {
+        pointsPano1.push_back(m_image1->GetPointXPt3D(pointsAleatoires[i]->NumPoint()));
+        pointsPano2.push_back(m_image2->GetPointXPt3D(pointsAleatoires[i]->NumPoint()));
+    }
+    Thomson_Shut(error, pointsPano1, pointsPano2, &rot_app, &trans_app, &echelle_app);
+    if(!TestEchelle())
+    {
+        XErrorAlert(error,__FUNCTION__,"echelle non valide, on recommence avec de nouveaux points");
+        return false;
+    }
+    //cout << "rotation : " << endl << app->rot_app << endl;
+    if(!TestRotation())
+    {
+        XErrorAlert(error,__FUNCTION__,"pas rotation 2D, on recommence avec de nouveaux points");
+        return false;
+    }
+//    if(!TestDistance())
+//    {
+//        XErrorAlert(error,__FUNCTION__,"transformation non valide, on recommence");
+//        return false;
+//    }
+    XErrorInfo(error,__FUNCTION__,"Transfo ok !");
+    return true;
+}

@@ -27,11 +27,9 @@ protected:
     bool InitPanos();
     bool AddResult(std::string fileResult);
     Panoramique* FindPano(std::string nom);
-    Appariement* PlusPointsCommun(std::string nom, std::vector<Panoramique*> pano_prec);
     Appariement* NonTraite();
-    bool Compensation(Appariement *app);
-    bool TestDistance(std::vector<Point*> pts1, std::vector<Point> pts2);
     bool Cheminement();
+    Appariement* PlusPointsCommun(std::string nom, std::vector<Panoramique*> pano_prec);
 
 public:
     Chantier(XError* error);
@@ -43,11 +41,11 @@ public:
     XError* Error() {return m_error;}
 
     // Méthodes
+    int NbPanoramiques();
     bool ChargePano(std::string dossier);
     bool CreationKey();
     bool CreationResult();
-    bool ChargeResult(std::string dossier);
-    int NbPanoramiques();
+    bool ChargeResult();
     bool Orientation();
 };
 

@@ -165,10 +165,10 @@ bool Chantier::AddResult(std::string fileResult)
     return true;
 }
 //------------------------------------------------------------
-bool Chantier::ChargeResult(std::string dossier)
+bool Chantier::ChargeResult()
 {
     std::vector<std::string> contenuDossier;
-    DIR * rep = opendir(dossier.c_str());
+    DIR * rep = opendir(m_strNomDossier.c_str());
     if (rep != NULL)
     {
         struct dirent * ent;
@@ -184,7 +184,7 @@ bool Chantier::ChargeResult(std::string dossier)
             AddResult(contenuDossier[i]);
 
     if (m_listeAppariement.size() == 0)
-        return XErrorError(m_error,__FUNCTION__,"pas de result valide dans ce dossier ",dossier.c_str());
+        return XErrorError(m_error,__FUNCTION__,"pas de result valide dans ce dossier ",m_strNomDossier.c_str());
 
     XErrorInfo(m_error,__FUNCTION__,"Nb d'appariements : ",st.itoa(m_listeAppariement.size()).c_str());
     return true;
@@ -203,37 +203,6 @@ Appariement* Chantier::NonTraite()
         break;
     }
     return app; //est un pointeur vers NULL si tout est déjà traité
-}
-//------------------------------------------------------------
-bool Chantier::Compensation(Appariement* app)
-{
-    std::vector<Point*> pointsAleatoires;
-    pointsAleatoires = app->ChoixQuatrePointsAleatoires(pointsAleatoires);
-    std::vector<XPt3D> pointsPano1, pointsPano2;
-    for(unsigned int i=0 ; i<pointsAleatoires.size() ; i++)
-    {
-        pointsPano1.push_back(app->Pano1()->GetPointXPt3D(pointsAleatoires[i]->NumPoint()));
-        pointsPano2.push_back(app->Pano2()->GetPointXPt3D(pointsAleatoires[i]->NumPoint()));
-    }
-    app->Thomson_Shut(m_error, pointsPano1, pointsPano2, &app->rot_app, &app->trans_app, &app->echelle_app);
-    if(!app->TestEchelle())
-    {
-        XErrorAlert(m_error,__FUNCTION__,"echelle non valide, on recommence avec de nouveaux points");
-        return false;
-    }
-    //cout << "rotation : " << endl << app->rot_app << endl;
-    if(!app->TestRotation())
-    {
-        XErrorAlert(m_error,__FUNCTION__,"pas rotation 2D, on recommence avec de nouveaux points");
-        return false;
-    }
-//    if(!app->TestDistance())
-//    {
-//        XErrorAlert(m_error,__FUNCTION__,"transformation non valide, on recommence");
-//        return false;
-//    }
-    XErrorInfo(m_error,__FUNCTION__,"Transfo ok !");
-    return true;
 }
 //------------------------------------------------------------
 Appariement* Chantier::PlusPointsCommun(std::string nom, std::vector<Panoramique*> pano_prec)
@@ -321,7 +290,7 @@ bool Chantier::Orientation()
     {
         sprintf(message,"%s et %s ",app->Pano1()->Nom().c_str(), app->Pano2()->Nom().c_str());
         XErrorInfo(m_error,__FUNCTION__,message);
-        if(!Compensation(app)) // si un des tests n'est pas bon, on recommence
+        if(!app->Compensation(m_error)) // si un des tests n'est pas bon, on recommence
             continue;
         app->traite = true;
     }

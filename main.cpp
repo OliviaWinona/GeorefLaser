@@ -76,7 +76,7 @@ int main(int argc, char **argv)
 //    }
 
     XErrorCommentaire(m_error,__FUNCTION__,"\n Charge les .result");
-    if(!projet->ChargeResult(nomDossier))
+    if(!projet->ChargeResult())
     {
         getchar();
         return 0;

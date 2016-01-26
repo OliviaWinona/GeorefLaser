@@ -22,6 +22,11 @@ protected:
     bool Nettoyage(Panoramique* pano1, Panoramique *pano2);
     bool DejaPresent(std::vector<Point*> lstPts, Point* pt);
     void CalculCoefAxiateur(double a,double b,double c,double theta,Eigen::Matrix3d *R);
+    bool Thomson_Shut(XError *error, std::vector<XPt3D> &ptPano1, std::vector<XPt3D> &ptPano2, Eigen::Matrix3d *R, Eigen::Vector3d *T, double *e);
+    std::vector<Point*> ChoixQuatrePointsAleatoires(std::vector<Point*> points);
+    bool TestEchelle();
+    bool TestRotation();
+    bool TestDistance();
 
 public:
     Appariement(Panoramique* pano1, Panoramique* pano2);
@@ -42,12 +47,8 @@ public:
     // Méthodes
     bool ChargeMesures(XError* error, std::string FileResult, int *nbPoints);
     int NbPointsApp();
-    std::vector<Point*> ChoixQuatrePointsAleatoires(std::vector<Point*> points);
-    bool Thomson_Shut(XError *error, std::vector<XPt3D> &ptPano1, std::vector<XPt3D> &ptPano2, Eigen::Matrix3d *R, Eigen::Vector3d *T, double *e);
     std::vector<Point> PointsCompense();
-    bool TestRotation();
-    bool TestEchelle();
-    bool TestDistance();
+    bool Compensation(XError* error);
 
 };
 
