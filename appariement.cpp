@@ -343,8 +343,8 @@ bool Appariement::TestDistance()
     {
         //AffichePoint(*m_listePointsPano1[i]);
         //AffichePoint(ptsCompenses[i]);
-        distance = distance2D(*m_listePointsPano1[i], ptsCompenses[1]);
-        if(ptsCompenses[i].Profondeur() <= 0)
+        distance = distance3D(*m_listePointsPano1[i], ptsCompenses[1]);
+        if(ptsCompenses[i].Hauteur() <= 0)
             continue;
         if(distance > 1000)
             continue;

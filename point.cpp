@@ -1,7 +1,7 @@
 #include <Eigen/Dense>
 #include <iostream>
 #include "point.h"
-#include "libXBase/XPt2D.h"
+#include "libXBase/XPt3D.h"
 
 Point::Point(int num, float l, float c, float z)
 {
@@ -24,14 +24,14 @@ Point Point::TransfPoint(Eigen::Matrix3d r, Eigen::Vector3d t, double e)
     return pt;
 }
 //------------------------------------------------------------
-double distance2D(Point pt1, Point pt2)
+double distance3D(Point pt1, Point pt2) //FONCTION A MODIF QUAND REMPLI COORDX ET COORDY
 {
-    XPt2D A((double)pt1.Colonne(), (double)pt1.Ligne());
-    XPt2D B((double)pt2.Colonne(), (double)pt2.Ligne());
+    XPt3D A((double)pt1.Colonne(), (double)pt1.Ligne(), (double)pt1.Hauteur());
+    XPt3D B((double)pt2.Colonne(), (double)pt2.Ligne(), (double)pt2.Hauteur());
     return dist(A,B);
 }
 //------------------------------------------------------------
 void AffichePoint(Point pt)
 {
-    std::cout << "num : " << pt.NumPoint() << ", colonne (x) : " << pt.Colonne() << ", ligne (y) : " << pt.Ligne() << ", profondeur (z) : " << pt.Profondeur() << std::endl;
+    std::cout << "num : " << pt.NumPoint() << ", colonne (x) : " << pt.Colonne() << ", ligne (y) : " << pt.Ligne() << ", profondeur (z) : " << pt.Hauteur() << std::endl;
 }

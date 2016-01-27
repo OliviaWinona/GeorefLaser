@@ -4,7 +4,6 @@
 #include <libXFileSystem/XSystemInfo.h>
 #include "XConsoleModelProcess.h"
 #include "shellapi.h"
-#include "libXBase/XPt3D.h"
 
 #include "chantier.h"
 #include "fonctions.h"

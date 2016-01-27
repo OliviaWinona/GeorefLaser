@@ -123,7 +123,7 @@ XPt3D Panoramique::GetPointXPt3D(int num)
     for(unsigned int i=0 ; i<m_tousPointsIm.size() ; i++)
     {
         if (m_tousPointsIm[i]->NumPoint() == num)
-            return XPt3D((double)m_tousPointsIm[i]->Colonne(), (double)m_tousPointsIm[i]->Ligne(), (double)m_tousPointsIm[i]->Profondeur());
+            return XPt3D((double)m_tousPointsIm[i]->Colonne(), (double)m_tousPointsIm[i]->Ligne(), (double)m_tousPointsIm[i]->Hauteur());
     }
     return NULL;
 }
@@ -142,7 +142,7 @@ bool Panoramique::EcrireXYZ()
         return false;
     for(unsigned int i=0 ; i<m_tousPointsIm.size() ; i++)
     {
-        fichierOut << m_tousPointsIm[i]->NumPoint() << " " << m_tousPointsIm[i]->Colonne() << " " << m_tousPointsIm[i]->Ligne() << " " << m_tousPointsIm[i]->Profondeur() << " 0.05\n";
+        fichierOut << m_tousPointsIm[i]->NumPoint() << " " << m_tousPointsIm[i]->Colonne() << " " << m_tousPointsIm[i]->Ligne() << " " << m_tousPointsIm[i]->Hauteur() << " 0.05\n";
     }
     fichierOut << "* Station : " << m_strNom << "\n";
     fichierOut << m_translation(0) << " " << m_translation(1) << " " << m_translation(2) << "\n";
