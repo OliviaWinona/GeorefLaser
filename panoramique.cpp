@@ -142,7 +142,9 @@ bool Panoramique::EcrireXYZ()
         return false;
     for(unsigned int i=0 ; i<m_tousPointsIm.size() ; i++)
     {
-        fichierOut << m_tousPointsIm[i]->NumPoint() << " " << m_tousPointsIm[i]->Colonne() << " " << m_tousPointsIm[i]->Ligne() << " " << m_tousPointsIm[i]->Hauteur() << " 0.05\n";
+        Point pt = *m_tousPointsIm[i];
+        pt = m_tousPointsIm[i]->TransfPoint(m_rotation, m_translation, m_echelle);
+        fichierOut <<pt.NumPoint() << " " << pt.Colonne() << " " << pt.Ligne() << " " << pt.Hauteur() << " 0.05\n";
     }
     fichierOut << "* Station : " << m_strNom << "\n";
     fichierOut << m_translation(0) << " " << m_translation(1) << " " << m_translation(2) << "\n";
